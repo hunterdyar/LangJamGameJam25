@@ -1,6 +1,6 @@
 
 {on-spawn
-	(set x 2)
+	(set x 0)
 	(set y 0)
 }
 #{components [test]}

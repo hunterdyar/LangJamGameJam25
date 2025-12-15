@@ -11,7 +11,7 @@ public static class RenderFunctions
 		var s = context.Scene.GridInfo.Scale;
 		Raylib_cs.Raylib.DrawRectangle(
 			context.Scene.GridInfo.XOffset+x*s,
-			context.Scene.GridInfo.XOffset+y*s,
+			context.Scene.GridInfo.YOffset+y*s,
 			s,
 			s,
 			c);

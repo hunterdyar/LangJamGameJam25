@@ -25,23 +25,30 @@ public static class GridFunctions
 	public static RuntimeObject? SetGrid(RuntimeBase context, RuntimeObject[] args)
 	{
 		var key = args[0].AsString();
-		var value = args[1].AsNumber();
 		switch (key)
 		{
 			case "scale":
-				context.Scene.GridInfo = context.Scene.GridInfo with { Scale = (int)value };
+				context.Scene.GridInfo.Scale = (int)args[1].AsNumber();
 				break;
 			case "y-offset":
-				context.Scene.GridInfo = context.Scene.GridInfo with { YOffset = (int)value };
+				context.Scene.GridInfo.SetYOffset(args[1].AsNumber());
 				break;
 			case "x-offset":
-				context.Scene.GridInfo = context.Scene.GridInfo with { XOffset = (int)value };
+				context.Scene.GridInfo.SetXOffset(args[1].AsNumber());
 				break;
 			case "rows":
-				context.Scene.GridInfo = context.Scene.GridInfo with { Rows = (int)value };
+				context.Scene.GridInfo.Rows = (int)args[1].AsNumber();
 				break;
 			case "cols":
-				context.Scene.GridInfo = context.Scene.GridInfo with { Cols = (int)value };
+				context.Scene.GridInfo.Cols = (int)args[1].AsNumber();
+				break;
+			case "horizontal-align":
+			case "h-align":
+				context.Scene.GridInfo.SetHorizontalAlignment(args[1].AsString());
+				break;
+			case "vertical-align":
+			case "v-align":
+				context.Scene.GridInfo.SetVerticalAlignment(args[1].AsString());
 				break;
 			default:
 				throw new Exception($"Unable to get grid data {key}.");
