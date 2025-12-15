@@ -1,0 +1,6 @@
+﻿namespace LangJam.Loader.Parser;
+
+public class Parser
+{
+	
+}
