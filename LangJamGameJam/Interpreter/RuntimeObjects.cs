@@ -2,6 +2,7 @@
 {
 	public abstract double AsNumber();
 	public abstract string AsString();
+	public abstract bool AsBool();
 }
 public abstract class RuntimeObject<T> : RuntimeObject
 {
@@ -28,12 +29,17 @@ public class LJString : RuntimeObject<string>
 
 	public override double AsNumber()
 	{
-		throw new Exception("Cannot convert string to number");
+		throw new Exception("Cannot implicitly convert string to number");
+	}
+
+	public override bool AsBool()
+	{
+		return string.IsNullOrEmpty(_value);
 	}
 
 	public override string AsString()
 	{
-		return _value;
+		throw new Exception("cannot implicitly convert string to bool");
 	}
 }
 
@@ -58,17 +64,27 @@ public class LJNumber : RuntimeObject<double>
 	{
 		return _value.ToString();
 	}
+
+	public override bool AsBool()
+	{
+		return _value == 0;
+	}
 }
 
 public class LJPoint : RuntimeObject<(double X, double Y)>
 {
 	public override double AsNumber()
 	{
-		throw new Exception("cannot convert point to number");
+		throw new Exception("cannot implicitly convert point to number");
 	}
 
 	public override string AsString()
 	{
-		throw new Exception("cannot convert point to string");
+		throw new Exception("cannot implicitly convert point to string");
+	}
+
+	public override bool AsBool()
+	{
+		throw new Exception("cannot implicitly convert point to bool");
 	}
 }

@@ -5,11 +5,12 @@ namespace LangJam;
 public abstract class RuntimeBase : IStackContext
 {
 	public Dictionary<string, RuntimeObject> Properties = new Dictionary<string, RuntimeObject>();
-
 	public SExpr? RenderCall;
 	public SExpr? OnSpawn;
+	public SExpr? OnEnable;
+	public SExpr? OnDisable;
 	public bool NeedsOnSpawn = true;
-
+	public bool Enabled = true;
 	public Game Game => _game;
 	protected Game _game;
 
@@ -33,6 +34,12 @@ public abstract class RuntimeBase : IStackContext
 					case "on-spawn":
 						OnSpawn = sExpr;
 						break;
+					case "on-enable":
+						OnEnable = sExpr;
+						break;
+					case "on-disable":
+						OnDisable = sExpr;
+						break;
 				}
 			}
 		}
@@ -44,8 +51,13 @@ public abstract class RuntimeBase : IStackContext
 		return Properties.TryGetValue(id, out expr);
 	}
 	
+	//todo: after we do {definitions}, these event functions can be different. although probably still want render cached without the lookup.
 	public virtual void CallRender()
 	{
+		if (!Enabled)
+		{
+			return;
+		}
 		if (RenderCall != null)
 		{
 			//todo: make 'execute-s-expr' a proper AST node so we can not do this 'skip identifier' garbage.
@@ -58,6 +70,10 @@ public abstract class RuntimeBase : IStackContext
 
 	public void CallOnSpawn()
 	{
+		if (!Enabled)
+		{
+			return;
+		}
 		if (!NeedsOnSpawn)
 		{
 			Console.WriteLine("calling onSpawn for entity twice! oops");
@@ -76,4 +92,22 @@ public abstract class RuntimeBase : IStackContext
 		NeedsOnSpawn = false;
 	}
 
+	public void SetEnabled(bool enabled)
+	{
+		if (Enabled && !enabled)
+		{
+			Enabled = enabled;
+			if (OnEnable != null)
+			{
+				_game.WalkStatement(OnEnable, this);
+			}
+		}else if (!Enabled && enabled)
+		{
+			Enabled = enabled;
+			if (OnDisable != null)
+			{
+				_game.WalkStatement(OnDisable, this);
+			}
+		}
+	}
 }

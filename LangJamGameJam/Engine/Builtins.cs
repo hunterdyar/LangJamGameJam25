@@ -27,7 +27,7 @@ public static class Builtins
 		return null;
 	}
 
-	public static RuntimeObject Get(RuntimeBase context, RuntimeObject[] args)
+	public static RuntimeObject? Get(RuntimeBase context, RuntimeObject[] args)
 	{
 		var key = args[0].AsString();
 
@@ -41,7 +41,7 @@ public static class Builtins
 
 		throw new Exception($"cannot get value {key} from {context}");
 	}
-	public static RuntimeObject Spawn(RuntimeBase context, RuntimeObject[] args)
+	public static RuntimeObject? Spawn(RuntimeBase context, RuntimeObject[] args)
 	{
 		if(context.Game.Prototypes.TryGetValue(args[0].AsString(), out var val))
 		{
@@ -51,6 +51,14 @@ public static class Builtins
 		{
 			throw new Exception($"Unable to spawn entity {args[0].ToString()}");
 		}
+		return null;
+	}
+
+	public static RuntimeObject? SetEnabled(RuntimeBase context, RuntimeObject[] args)
+	{
+		var shouldBeEnabled = args[1].AsBool();
+		context.SetEnabled(shouldBeEnabled);
+		
 		return null;
 	}
 }
