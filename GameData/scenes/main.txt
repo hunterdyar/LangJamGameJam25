@@ -1,0 +1,2 @@
+(spawn player)
+#(p (set x 10) (set y 10))

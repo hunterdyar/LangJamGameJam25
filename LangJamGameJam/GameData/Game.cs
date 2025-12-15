@@ -1,6 +1,73 @@
-﻿namespace HelloWorld.GameData;
+﻿using LangJam.Loader.AST;
+using Microsoft.VisualBasic;
 
-public class Game
+namespace LangJam;
+
+public class Game : IStackContext
 {
+	//interpreter things
+	private Interpreter _interpreter;
+	//list of sprite data
+	//list of level data
+	//list of entities
+	public Dictionary<string, ComponentDefinition> Components => _components;
+	private Dictionary<string, ComponentDefinition> _components;
 	
+	private Dictionary<string, Expr> Globals = new Dictionary<string, Expr>();
+	public Dictionary<string, EntityDefinition> Prototypes;
+	public Dictionary<string, SceneDefinition> SceneDefinitions => _sceneDefinitions;
+	private Dictionary<string, SceneDefinition> _sceneDefinitions;
+	public Scene _loadedScene;
+
+	public Game()
+	{
+		_interpreter = new Interpreter();
+	}
+	public void SetComponentDefinitions(Dictionary<string, ComponentDefinition> components)
+	{
+		_components = components;
+	}
+
+	public void SetEntityDefinitions(Dictionary<string, EntityDefinition> entitiyDefs)
+	{
+		Prototypes = entitiyDefs;
+	}
+
+	public void SpawnEntity(EntityDefinition definition)
+	{
+		var e = definition.GetRuntimeEntity(this);
+		_loadedScene.AddEntity(e);
+	}
+
+	public void WalkStatement(Expr expr, RuntimeBase context)
+	{
+		_interpreter.WalkStatement(expr, context);
+	}
+
+	public void LoadScene(SceneDefinition sceneDef)
+	{
+		_loadedScene = sceneDef.CreateInstance(this);
+		_loadedScene.RunSceneLogic();
+	}
+	
+	public bool TryGetProperty(string id, out Expr expr)
+	{
+		return Globals.TryGetValue(id, out expr);
+	}
+
+	//called by render method.
+	public void Tick()
+	{
+		_loadedScene.Tick();
+	}
+
+	public void SetSceneDefinitions(Dictionary<string, SceneDefinition> sceneDefs)
+	{
+		_sceneDefinitions = sceneDefs;
+	}
+}
+
+public interface IStackContext
+{
+	public bool TryGetProperty(string id, out Expr expr);
 }

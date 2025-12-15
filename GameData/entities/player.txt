@@ -1,0 +1,9 @@
+(on-spawn
+	(set x 0)
+	(set y 0)
+)
+#{components [test]}
+
+(render
+	(draw-grid-color 2 2 red)
+	)

@@ -1,6 +1,23 @@
-﻿namespace HelloWorld;
+﻿using Raylib_cs;
 
-public class Utilities
+public static class Utilities
 {
-	
+	public static Color StringToColor(string cname)
+	{
+		switch (cname.ToLower())
+		{
+			case "black":
+				return Color.Black;
+			case "white":
+				return Color.White;
+			case "green":
+				return Color.Green;
+			case "blue":
+				return Color.Blue;
+			case "red":
+				return Color.Red;
+			default:
+				return Color.Magenta;
+		}
+	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlTypes;
+using System.Text;
 
 namespace LangJam.Loader.AST;
 
@@ -9,47 +10,134 @@ public class Expr
 //()
 public class SExpr : Expr
 {
-	public Identifier? Identifier => elements.Count > 0 ? elements[0] as Identifier : null;
+	public IdentifierConstant? Identifier;
 	public List<Expr> elements = new List<Expr>();
 
 	public SExpr(List<Expr> expressions)
 	{
 		elements = expressions;
+		Identifier = elements.Count > 0 ? elements[0] as IdentifierConstant : null;
+	}
+
+	public override string ToString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.Append('(');
+		for (var i = 0; i < elements.Count; i++)
+		{
+			var e = elements[i];
+			sb.Append(e.ToString());
+			if (i < elements.Count - 1)
+			{
+				sb.Append(' ');
+			}
+		}
+
+		sb.Append(')');
+		return sb.ToString();
 	}
 }
 
 //{}
 public class DeclareExpr : SExpr
 {
+	private List<Expr> elements;
+
 	public DeclareExpr(List<Expr> expressions) : base(expressions)
 	{
+		elements = expressions;
+	}
+
+	public override string ToString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.Append('{');
+		for (var i = 0; i < elements.Count; i++)
+		{
+			var e = elements[i];
+			sb.Append(e.ToString());
+			if (i < elements.Count - 1)
+			{
+				sb.Append(' ');
+			}
+		}
+
+		sb.Append('}');
+		return sb.ToString();
 	}
 }
-
 //[]
 
-//~ or true or false
+//~, an expression explicitly coerced into a boolean.
 public class BooleanExpr : Expr
 {
-	
+	public Expr Expr => _expr;
+	private Expr _expr;
+	public BooleanExpr(Expr expr)
+	{
+		_expr = expr;
+	}
+
+	public override string ToString()
+	{
+		return "(bool " + _expr.ToString() + ")";
+	}
 }
 
 public class Point : Expr
 {
 	public Expr X;
 	public Expr Y;
+
+	public Point(Expr x, Expr y)
+	{
+		X = x;
+		Y = y;
+	}
+
+	public override string ToString()
+	{
+		return "(point " + X + " " + Y+")";
+	}
 }
-public class NumberConstant : Expr
+public class NumberConstant(double val) : Expr
 {
 	public double Value;
+	public RuntimeObject RuntimeValue => new LJNumber(Value);
+
+	public override string ToString()
+	{
+		return Value.ToString();
+	}
 }
 
-public class Identifier : Expr
+public class IdentifierConstant : Expr
 {
 	private string Value;
+
+	public IdentifierConstant(string s)
+	{
+		Value = s;
+	}
+
+	public override string ToString()
+	{
+		return Value;
+	}
 }
 
 public class StringConstant : Expr
 {
 	public string Value;
+	public RuntimeObject RuntimeValue => new LJString(Value);
+	public StringConstant(string topSource)
+	{
+		Value = topSource;
+	}
+
+
+	public override string ToString()
+	{
+		return "\"" + Value + "\"";
+	}
 }

@@ -16,4 +16,9 @@ public struct Token
 		TokenType = tokenType;
 		_source = c;
 	}
+
+	public override string ToString()
+	{
+		return _source.ToString();
+	}
 }

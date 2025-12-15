@@ -12,7 +12,6 @@ public enum TokenType
 	OpenDeclare,
 	CloseDeclare,
 	String,
-	Comment,
 	Value,
 	EOF,
 }
