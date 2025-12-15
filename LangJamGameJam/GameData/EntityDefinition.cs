@@ -51,12 +51,7 @@ public class EntityDefinition
 			comps.Add(definition.CreateInstance(game, e));
 		}
 		e.Components = comps;
-
-		//entity file runs when instanced.
-		foreach (var logic in entityLogic)
-		{
-			game.WalkStatement(logic, e);
-		}
+		e.RegisterEventFunctions(this.entityLogic);
 		
 		return e;
 	}

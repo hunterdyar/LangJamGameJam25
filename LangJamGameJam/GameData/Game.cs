@@ -13,7 +13,7 @@ public class Game : IStackContext
 	public Dictionary<string, ComponentDefinition> Components => _components;
 	private Dictionary<string, ComponentDefinition> _components;
 	
-	private Dictionary<string, Expr> Globals = new Dictionary<string, Expr>();
+	private Dictionary<string, RuntimeObject> Globals = new Dictionary<string, RuntimeObject>();
 	public Dictionary<string, EntityDefinition> Prototypes;
 	public Dictionary<string, SceneDefinition> SceneDefinitions => _sceneDefinitions;
 	private Dictionary<string, SceneDefinition> _sceneDefinitions;
@@ -37,6 +37,7 @@ public class Game : IStackContext
 	{
 		var e = definition.GetRuntimeEntity(this);
 		_loadedScene.AddEntity(e);
+		e.CallOnSpawn();
 	}
 
 	public void WalkStatement(Expr expr, RuntimeBase context)
@@ -50,7 +51,7 @@ public class Game : IStackContext
 		_loadedScene.RunSceneLogic();
 	}
 	
-	public bool TryGetProperty(string id, out Expr expr)
+	public bool TryGetProperty(string id, out RuntimeObject expr)
 	{
 		return Globals.TryGetValue(id, out expr);
 	}
@@ -69,5 +70,5 @@ public class Game : IStackContext
 
 public interface IStackContext
 {
-	public bool TryGetProperty(string id, out Expr expr);
+	public bool TryGetProperty(string id, out RuntimeObject runtimeObject);
 }

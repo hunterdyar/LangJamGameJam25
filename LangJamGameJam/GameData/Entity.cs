@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using LangJam.Loader.AST;
 
 namespace LangJam;
@@ -11,12 +12,12 @@ public class Entity : RuntimeBase
 		public List<Component> Components;
 		//true when scene has added entity.
 		public bool Loaded { get; private set; }
-		public bool NeedsOnSpawn = true;
 		private EntityDefinition _definition;
+		
 		public Entity(EntityDefinition definition, Game game) : base(game)
 		{
 			_definition = definition;
-			Properties = new Dictionary<string, Expr>();
+			
 		}
 
 		public void SetLoaded(bool loaded)
@@ -33,24 +34,8 @@ public class Entity : RuntimeBase
 				comp.CallRender();
 			}
 		}
-
-		public void RunOnSpawn()
-		{
-			if (!NeedsOnSpawn)
-			{
-				Console.WriteLine("calling onSpawn for entity again.");
-				return;
-			}
-
-			if (Properties.TryGetValue("on-spawn", out var onSpawnExp))
-			{
-				_game.WalkStatement(onSpawnExp, this);
-			}
-
-			NeedsOnSpawn = false;
-		}
-
-		public override bool TryGetProperty(string id, [NotNullWhen(true)] out Expr expr)
+	
+		public override bool TryGetProperty(string id, [NotNullWhen(true)] out RuntimeObject expr)
 		{
 			if (Properties.TryGetValue(id, out expr))
 			{

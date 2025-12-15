@@ -6,16 +6,15 @@ public class Component : RuntimeBase
 {
 	private List<Expr> _exprs;
 	private Entity _entity;
-	private Dictionary<string, Expr> Properties;
 
 	public Component(List<Expr> exprs, Entity entity, Game game) : base(game)
 	{
 		_exprs = exprs;
 		_entity = entity;
-		Properties = new Dictionary<string, Expr>();
+		RegisterEventFunctions(_exprs);
 	}
 	
-	public override bool TryGetProperty(string id, out Expr expr)
+	public override bool TryGetProperty(string id, out RuntimeObject expr)
 	{
 		if (!Properties.TryGetValue(id, out expr))
 		{

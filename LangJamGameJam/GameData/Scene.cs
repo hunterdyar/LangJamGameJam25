@@ -55,11 +55,11 @@ public class Scene : RuntimeBase
 		}
 	}
 
-	public override bool TryGetProperty(string id, out Expr expr)
+	public override bool TryGetProperty(string id, out RuntimeObject ro)
 	{
-		if (!Properties.TryGetValue(id, out expr))
+		if (!Properties.TryGetValue(id, out ro))
 		{
-			return _game.TryGetProperty(id, out expr);
+			return _game.TryGetProperty(id, out ro);
 		}
 		return true;
 	}

@@ -32,12 +32,12 @@ public class Interpreter
 	}
 
 	//we anticipate a value to be spit out here... but all expressions are values...
-	private RuntimeObject WalkExpression(Expr expr, IStackContext context)
+	private RuntimeObject WalkExpression(Expr expr, RuntimeBase context)
 	{
 		switch (expr)
 		{
 			case NumberConstant numberConstant:
-				return new LJNumber(numberConstant.Value);
+				return numberConstant.RuntimeValue;
 			case StringConstant stringConstant:
 				return stringConstant.RuntimeValue;
 			case IdentifierConstant identifier:
@@ -48,6 +48,27 @@ public class Interpreter
 				//number is non-zero
 				//identifiers are true/false/error
 				//string is type-error.
+				break;
+			case SExpr sexpr:
+				if (Builtins.BuiltinFunctions.TryGetValue(sexpr.Identifier.ToString(), out var call))
+				{
+					var args = new RuntimeObject[sexpr.elements.Count - 1];
+					for (int i = 1; i < sexpr.elements.Count; i++)
+					{
+						var ro = WalkExpression(sexpr.elements[i], context);
+						args[i - 1] = ro;
+					}
+
+					var x = call?.Invoke(context, args);
+					if (x != null)
+					{
+						return x;
+					}
+					else
+					{
+						throw new Exception("wait does this language have nulls?");
+					}
+				}
 				break;
 		}
 

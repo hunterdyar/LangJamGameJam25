@@ -100,11 +100,15 @@ public class Point : Expr
 		return "(point " + X + " " + Y+")";
 	}
 }
-public class NumberConstant(double val) : Expr
+public class NumberConstant : Expr
 {
 	public double Value;
 	public RuntimeObject RuntimeValue => new LJNumber(Value);
 
+	public NumberConstant(double val)
+	{
+		Value = val;
+	}
 	public override string ToString()
 	{
 		return Value.ToString();
