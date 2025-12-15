@@ -6,12 +6,13 @@ public class Scene : RuntimeBase
 {
 	public List<Expr> SceneLogic;
 	private List<Entity> _entities;
-	
-	public Scene(Game game) : base(game)
+	public GridInfo GridInfo => _gridInfo;
+	private GridInfo _gridInfo = new GridInfo();
+	public Scene(Game game) : base(game, null)
 	{
+		_scene = this;
 		_entities = new List<Entity>();
 	}
-
 	public void RunSceneLogic()
 	{
 		foreach (var core in SceneLogic)
@@ -63,4 +64,14 @@ public class Scene : RuntimeBase
 		}
 		return true;
 	}
+
+	#region RuntimeHelpers
+
+	public bool GetEntitiesAt(LJPoint point, out List<Entity> entities)
+	{
+		entities = _entities.Where(x=> x.Position == point).ToList();
+		return entities.Any();
+	}
+
+	#endregion
 }

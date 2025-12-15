@@ -8,8 +8,13 @@ public static class RenderFunctions
 		var y = (int)args[1].AsNumber();
 		var cs = args[2].AsString();
 		var c = Utilities.StringToColor(cs);
-		
-		Raylib_cs.Raylib.DrawRectangle(x*10, y*10, 100, 100, c);
+		var s = context.Scene.GridInfo.Scale;
+		Raylib_cs.Raylib.DrawRectangle(
+			context.Scene.GridInfo.XOffset+x*s,
+			context.Scene.GridInfo.XOffset+y*s,
+			s,
+			s,
+			c);
 		return null;
 	}
 }

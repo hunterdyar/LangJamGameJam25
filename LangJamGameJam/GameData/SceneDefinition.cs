@@ -9,7 +9,10 @@ public class SceneDefinition : DefinitionBase<Scene>
 	{
 	}
 
-	public override Scene CreateInstance(Game game)
+	/// <summary>
+	/// Scene override gets ignored for now BUT this is how we would do a parent relationship, i think?
+	/// </summary>
+	public override Scene CreateInstance(Game game, Scene scene)
 	{
 		return new Scene(game)
 		{

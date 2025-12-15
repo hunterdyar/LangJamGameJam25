@@ -1,9 +1,10 @@
-(on-spawn
-	(set x 15)
-	(set y 5)
-)
+
+{on-spawn
+	(set x 2)
+	(set y 0)
+}
 #{components [test]}
 
-(render
+{render
 	(draw-grid-color (get x) (get y) red)
-)
+}

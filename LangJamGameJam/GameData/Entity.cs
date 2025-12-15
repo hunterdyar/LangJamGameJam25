@@ -6,18 +6,20 @@ namespace LangJam;
 
 public class Entity : RuntimeBase
 {
-	//an entity is a list of components and properties.
-	//the system loops through all entities, and, for each component, calls the appropriate hooks with the entity properties as part of the stack context.
+	public LJPoint Position => new LJPoint(Properties["x"].AsNumber(), Properties["y"].AsNumber());
+		
+		
+		//an entity is a list of components and properties.
+		//the system loops through all entities, and, for each component, calls the appropriate hooks with the entity properties as part of the stack context.
 		//so like, basically 'object oriented' ish?
 		public List<Component> Components;
 		//true when scene has added entity.
 		public bool Loaded { get; private set; }
 		private EntityDefinition _definition;
 		
-		public Entity(EntityDefinition definition, Game game) : base(game)
+		public Entity(EntityDefinition definition, Game game, Scene scene) : base(game, scene)
 		{
 			_definition = definition;
-			
 		}
 
 		public void SetLoaded(bool loaded)

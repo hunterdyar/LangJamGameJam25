@@ -1,2 +1,14 @@
 (spawn player)
-#(p (set x 10) (set y 10))
+(setgrid scale 50)
+(setgrid x-offset 10)
+(setgrid y-offset 30)
+(setgrid rows 1)
+(setgrid cols 5)
+
+
+
+#{render
+#	(for 0 (getgrid rows))
+#		(for 0 (getgrid cols))
+#	)
+#}

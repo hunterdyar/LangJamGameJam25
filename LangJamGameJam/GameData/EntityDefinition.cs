@@ -17,7 +17,7 @@ public class EntityDefinition : DefinitionBase<Entity>
 		CompList = compList;
 	}
 
-	public override Entity CreateInstance(Game game)
+	public override Entity CreateInstance(Game game, Scene scene)
 	{
 		//lazy init.
 		if (compListDirty)
@@ -39,13 +39,13 @@ public class EntityDefinition : DefinitionBase<Entity>
 		}
 
 		var comps = new List<Component>();
-		var e = new Entity(this, game)
+		var e = new Entity(this, game, scene)
 		{
 			Components = comps,
 		};
 		foreach (var definition in RealizedCompList)
 		{
-			var c = definition.CreateInstance(game);
+			var c = definition.CreateInstance(game, scene);
 			c.SetEntity(e);
 			comps.Add(c);
 		}

@@ -35,7 +35,7 @@ public class Game : IStackContext
 
 	public void SpawnEntity(EntityDefinition definition)
 	{
-		var e = definition.CreateInstance(this);
+		var e = definition.CreateInstance(this, _loadedScene);
 		_loadedScene.AddEntity(e);
 		e.CallOnSpawn();
 	}
@@ -47,7 +47,7 @@ public class Game : IStackContext
 
 	public void LoadScene(SceneDefinition sceneDef)
 	{
-		_loadedScene = sceneDef.CreateInstance(this);
+		_loadedScene = sceneDef.CreateInstance(this, null!);
 		_loadedScene.RunSceneLogic();
 	}
 	

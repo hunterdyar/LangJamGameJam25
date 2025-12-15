@@ -1,1 +1,1 @@
-(render (draw-grid-solid 2 3 blue))
+{render (draw-grid-solid 2 3 blue)}

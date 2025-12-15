@@ -52,7 +52,7 @@ public class Parser
 				throw new Exception($"Unexpected end of file in {_context}.");
 		}
 
-		throw new Exception($"Unexpected token {top}");
+		throw new Exception($"Unexpected token {top} in {_context}");
 
 	}
 
@@ -84,7 +84,7 @@ public class Parser
 	{
 		List<AST.Expr> expressions = new List<AST.Expr>();
 		var id = _tokens.Dequeue();
-		while (_tokens.Peek().TokenType != TokenType.CloseParen)
+		while (_tokens.Peek().TokenType != TokenType.CloseDeclare)
 		{
 			expressions.Add(ParseExpression());
 		}

@@ -9,6 +9,24 @@ public class Tokenizer
 	public string Source;
 	public int Length;
 	private string _context;
+
+	public string GetPrettyPos(int position)
+	{
+		string err = "";
+		int line = 0;
+		int col = 0;
+		for (int i = 0; i < position; i++)
+		{
+			col++;
+			if (Source[i] == '\n')
+			{
+				line++;
+				col = 0;
+			}
+		}
+
+		return $"line {line}, col {col}";
+	}
 	public List<Token> Tokenize(string contextName, string source)
 	{
 		_context = contextName;
@@ -31,7 +49,7 @@ public class Tokenizer
 				}
 				else
 				{
-					throw new Exception($"unexpected tokenization error at {token} in {contextName}");
+					throw new Exception($"unexpected tokenization error at {token} in {contextName}. {GetPrettyPos(pos)}");
 				}
 			}
 		}
@@ -47,6 +65,7 @@ public class Tokenizer
 		if (Consume('#'))
 		{
 			ConsumeUntilLinebreak();
+			return TokenizeNext(out token);//quick hack to handle multiline comments.
 		}
 
 		ConsumeWhitespace();
@@ -140,7 +159,7 @@ public class Tokenizer
 			pos++;
 			if (pos >= Length)
 			{
-				throw new Exception($"unexpected end of file. in {_context}. missing {c}");
+				throw new Exception($"unexpected end of file. in {_context}. missing {c}. {GetPrettyPos(pos)}");
 			}
 		}
 

@@ -1,10 +1,12 @@
-﻿public abstract class RuntimeObject
+﻿using LangJam;
+
+public abstract class RuntimeObject
 {
 	public abstract double AsNumber();
 	public abstract string AsString();
 	public abstract bool AsBool();
 }
-public abstract class RuntimeObject<T> : RuntimeObject
+public abstract class RuntimeObject<T> : RuntimeObject, IEquatable<RuntimeObject<T>>
 {
 	public T Value => _value;
 	protected T _value;
@@ -18,6 +20,38 @@ public abstract class RuntimeObject<T> : RuntimeObject
 	{
 		throw new Exception("type error, can't convert val to type");
 	}
+
+	#region GeneratedEquality
+	
+	public bool Equals(RuntimeObject<T>? other)
+	{
+		if (other is null) return false;
+		if (ReferenceEquals(this, other)) return true;
+		return EqualityComparer<T>.Default.Equals(_value, other._value);
+	}
+
+	public override bool Equals(object? obj)
+	{
+		return ReferenceEquals(this, obj) || obj is RuntimeObject<T> other && Equals(other);
+	}
+
+	public override int GetHashCode()
+	{
+		return EqualityComparer<T>.Default.GetHashCode(_value);
+	}
+
+	public static bool operator ==(RuntimeObject<T>? left, RuntimeObject<T>? right)
+	{
+		return Equals(left, right);
+	}
+
+	public static bool operator !=(RuntimeObject<T>? left, RuntimeObject<T>? right)
+	{
+		return !Equals(left, right);
+	}
+
+	#endregion
+
 }
 
 public class LJString : RuntimeObject<string>
@@ -73,6 +107,22 @@ public class LJNumber : RuntimeObject<double>
 
 public class LJPoint : RuntimeObject<(double X, double Y)>
 {
+	public LJNumber X
+	{
+		get => new(_value.X);
+		set => _value.X = value.Value;
+	} 
+	public LJNumber Y
+	{
+		get => new(_value.Y);
+		set => _value.Y = value.Value;
+	} 
+
+	public LJPoint(double x, double y)
+	{
+		_value = (x, y);
+	}
+
 	public override double AsNumber()
 	{
 		throw new Exception("cannot implicitly convert point to number");
@@ -86,5 +136,23 @@ public class LJPoint : RuntimeObject<(double X, double Y)>
 	public override bool AsBool()
 	{
 		throw new Exception("cannot implicitly convert point to bool");
+	}
+}
+
+public class LJEntityReference : RuntimeObject<Entity>
+{
+	public override double AsNumber()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override string AsString()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override bool AsBool()
+	{
+		throw new NotImplementedException();
 	}
 }

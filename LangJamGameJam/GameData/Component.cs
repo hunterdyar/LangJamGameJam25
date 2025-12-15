@@ -7,7 +7,7 @@ public class Component : RuntimeBase
 	private List<Expr> _exprs;
 	private Entity _entity;
 
-	public Component(List<Expr> exprs, Game game) : base(game)
+	public Component(List<Expr> exprs, Game game, Scene scene) : base(game, scene)
 	{
 		_exprs = exprs;
 		RegisterEventFunctions(_exprs);

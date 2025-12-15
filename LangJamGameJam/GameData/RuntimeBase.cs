@@ -5,18 +5,22 @@ namespace LangJam;
 public abstract class RuntimeBase : IStackContext
 {
 	public Dictionary<string, RuntimeObject> Properties = new Dictionary<string, RuntimeObject>();
-	public SExpr? RenderCall;
-	public SExpr? OnSpawn;
-	public SExpr? OnEnable;
-	public SExpr? OnDisable;
+	//todo:ExpressionBody Type
+	public Expr[]? RenderCall;
+	public Expr[]? OnSpawn;
+	public Expr[]? OnEnable;
+	public Expr[]? OnDisable;
 	public bool NeedsOnSpawn = true;
 	public bool Enabled = true;
 	public Game Game => _game;
 	protected Game _game;
+	public Scene Scene => _scene;
+	protected Scene _scene;
 
-	protected RuntimeBase(Game game)
+	protected RuntimeBase(Game game, Scene scene)
 	{
 		_game = game;
+		_scene = scene;
 	}
 
 	public void RegisterEventFunctions(List<Expr> baseExpressions)
@@ -24,21 +28,21 @@ public abstract class RuntimeBase : IStackContext
 		int registeredCount = 0;
 		foreach (var expression in baseExpressions)
 		{
-			if (expression is SExpr sExpr)
+			if (expression is DeclareExpr decExpr)
 			{
-				switch (sExpr.Identifier.ToString())
+				switch (decExpr.Identifier.ToString())
 				{
 					case "render":
-						RenderCall = sExpr;
+						RenderCall = decExpr.elements;
 						break;
 					case "on-spawn":
-						OnSpawn = sExpr;
+						OnSpawn = decExpr.elements;
 						break;
 					case "on-enable":
-						OnEnable = sExpr;
+						OnEnable = decExpr.elements;
 						break;
 					case "on-disable":
-						OnDisable = sExpr;
+						OnDisable = decExpr.elements;
 						break;
 				}
 			}
@@ -60,11 +64,7 @@ public abstract class RuntimeBase : IStackContext
 		}
 		if (RenderCall != null)
 		{
-			//todo: make 'execute-s-expr' a proper AST node so we can not do this 'skip identifier' garbage.
-			for (int i = 1; i < RenderCall.elements.Count; i++)
-			{
-				_game.WalkStatement(RenderCall.elements[i], this);
-			}
+			WalkExpressionArray(RenderCall);
 		}
 	}
 
@@ -82,11 +82,7 @@ public abstract class RuntimeBase : IStackContext
 
 		if (OnSpawn != null)
 		{
-			//see todo about onrender, refactoring these AST nodes.
-			for (int i = 0; i < OnSpawn.elements.Count; i++)
-			{
-				_game.WalkStatement(OnSpawn.elements[i], this);
-			}
+			WalkExpressionArray(OnSpawn);
 		}
 
 		NeedsOnSpawn = false;
@@ -97,17 +93,19 @@ public abstract class RuntimeBase : IStackContext
 		if (Enabled && !enabled)
 		{
 			Enabled = enabled;
-			if (OnEnable != null)
-			{
-				_game.WalkStatement(OnEnable, this);
-			}
+			WalkExpressionArray(OnEnable);
 		}else if (!Enabled && enabled)
 		{
 			Enabled = enabled;
-			if (OnDisable != null)
-			{
-				_game.WalkStatement(OnDisable, this);
-			}
+			WalkExpressionArray(OnDisable);
+		}
+	}
+
+	private void WalkExpressionArray(Expr[] exprs)
+	{
+		for (int i = 0; i < exprs.Length; i++)
+		{
+			_game.WalkStatement(exprs[i],this);
 		}
 	}
 }
