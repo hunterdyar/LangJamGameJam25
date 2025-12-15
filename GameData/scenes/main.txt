@@ -1,14 +1,14 @@
 (spawn player)
-(setgrid scale 50)
-(setgrid x-offset 10)
-(setgrid y-offset 30)
-(setgrid rows 1)
-(setgrid cols 5)
+(set-grid scale 100)
+(set-grid x-offset 10)
+(set-grid y-offset 30)
+(set-grid rows 1)
+(set-grid cols 5)
 
 
 
 #{render
-#	(for 0 (getgrid rows))
-#		(for 0 (getgrid cols))
+#	(for 0 (get-grid rows))
+#		(for 0 (get-grid cols))
 #	)
-#}
+#}row

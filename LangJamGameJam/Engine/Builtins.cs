@@ -4,11 +4,13 @@ public static class Builtins
 {
 	public static Dictionary<string, Func<RuntimeBase, RuntimeObject[], RuntimeObject?>> BuiltinFunctions =
 		new Dictionary<string, Func<
-			RuntimeBase, RuntimeObject[], RuntimeObject>>{
+			RuntimeBase, RuntimeObject[], RuntimeObject?>>{
 			{ "draw-grid-color", RenderFunctions.DrawGridColor },
 			{ "spawn", Spawn },
 			{ "get", Get},
 			{ "set", Set},
+			{ "get-grid", GridFunctions.GetGrid},
+			{"set-grid", GridFunctions.SetGrid},
 		};
 
 	public static RuntimeObject? Set(RuntimeBase context, RuntimeObject[] args)

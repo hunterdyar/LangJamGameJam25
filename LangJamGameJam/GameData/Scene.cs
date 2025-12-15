@@ -6,7 +6,12 @@ public class Scene : RuntimeBase
 {
 	public List<Expr> SceneLogic;
 	private List<Entity> _entities;
-	public GridInfo GridInfo => _gridInfo;
+	public GridInfo GridInfo
+	{
+		get => _gridInfo;
+		set => _gridInfo = value;
+	}
+
 	private GridInfo _gridInfo = new GridInfo();
 	public Scene(Game game) : base(game, null)
 	{
