@@ -1,16 +1,8 @@
 ﻿namespace LangJam;
 
-public enum HAlignment
-{
-	Left,
-	Center,
-	Right
-}
+public enum HAlignment { Left, Center, Right }
+public enum VAlignment { Top, Middle, Bottom }
 
-public enum VAlignment
-{
-	Top, Middle, Bottom
-}
 public class GridInfo
 {
 	public int Scale = 100;

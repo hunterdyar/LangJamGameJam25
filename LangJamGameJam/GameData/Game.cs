@@ -17,6 +17,10 @@ public class Game : IStackContext
 	public Dictionary<string, EntityDefinition> Prototypes;
 	public Dictionary<string, SceneDefinition> SceneDefinitions => _sceneDefinitions;
 	private Dictionary<string, SceneDefinition> _sceneDefinitions;
+
+	public Dictionary<string, Sprite> Sprites => _sprites;
+	private Dictionary<string, Sprite> _sprites = new Dictionary<string, Sprite>();
+	
 	public Scene _loadedScene;
 
 	public Game()
@@ -31,6 +35,11 @@ public class Game : IStackContext
 	public void SetEntityDefinitions(Dictionary<string, EntityDefinition> entitiyDefs)
 	{
 		Prototypes = entitiyDefs;
+	}
+
+	public void SetSprites(Dictionary<string, Sprite> sprites)
+	{
+		_sprites = sprites;
 	}
 
 	public void SpawnEntity(EntityDefinition definition)

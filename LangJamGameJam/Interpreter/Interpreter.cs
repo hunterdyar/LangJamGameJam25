@@ -69,6 +69,10 @@ public class Interpreter
 						throw new Exception("wait does this language have nulls?");
 					}
 				}
+				else
+				{
+					throw new Exception($"unknown call to {sexpr.Identifier.ToString()}");
+				}
 				break;
 		}
 

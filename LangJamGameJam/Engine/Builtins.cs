@@ -6,6 +6,7 @@ public static class Builtins
 		new Dictionary<string, Func<
 			RuntimeBase, RuntimeObject[], RuntimeObject?>>{
 			{ "draw-grid-color", RenderFunctions.DrawGridColor },
+			{ "draw-grid-sprite", RenderFunctions.DrawGridSprite},
 			{ "spawn", Spawn },
 			{ "get", Get},
 			{ "set", Set},

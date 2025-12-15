@@ -139,6 +139,23 @@ public class LJPoint : RuntimeObject<(double X, double Y)>
 	}
 }
 
+public class LJSprite : RuntimeObject<Raylib_cs.RenderTexture2D>
+{
+	public override double AsNumber()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override string AsString()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override bool AsBool()
+	{
+		throw new NotImplementedException();
+	}
+}
 public class LJEntityReference : RuntimeObject<Entity>
 {
 	public override double AsNumber()

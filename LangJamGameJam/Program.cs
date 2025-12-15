@@ -15,14 +15,14 @@ internal static class Program
 		}
 
 		DirectoryInfo source = new DirectoryInfo(gameDir);
-		var game = GameLoader.LoadGame(source);
-		
 		Raylib.InitWindow(800, 480, gameDir);
 
+		var game = GameLoader.LoadGame(source);
+		
 		while (!Raylib.WindowShouldClose())
 		{
 			Raylib.BeginDrawing();
-			Raylib.ClearBackground(Color.White);
+			Raylib.ClearBackground(Color.White);//game.loadedscene.backgroundColor
 
 			Raylib.DrawText("Hello, world!", 12, 12, 20, Color.Black);
 			game.Tick();

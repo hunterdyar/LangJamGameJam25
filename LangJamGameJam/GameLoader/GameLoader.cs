@@ -50,6 +50,7 @@ public static class GameLoader
 		game.SetComponentDefinitions(LoadComponents(_componentsFiles));
 		game.SetSceneDefinitions(LoadScenes(_sceneFiles));
 		game.SetEntityDefinitions(LoadEntities(_entityFiles));
+		game.SetSprites(LoadSprites(_spriteFiles));
 		if (game.SceneDefinitions.TryGetValue("main", out var mainScene))
 		{
 			game.LoadScene(mainScene);
@@ -72,6 +73,25 @@ public static class GameLoader
 		//game.lj set width/heights/etc.
 		
 		return game;
+	}
+
+	private static Dictionary<string, Sprite> LoadSprites(List<FileInfo> spriteFiles)
+	{
+		Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
+		foreach (var fileInfo in spriteFiles)
+		{
+			if (fileInfo.Extension.ToLower() != ".png")
+			{
+				Console.WriteLine($"unable to load sprite {fileInfo.Name}");
+				continue;
+			}
+
+			var sName = Path.GetFileNameWithoutExtension(fileInfo.Name).ToLower();
+			var tex = Raylib_cs.Raylib.LoadTexture(fileInfo.FullName);
+			sprites.Add(sName, new Sprite(sName, tex));
+		}
+
+		return sprites;
 	}
 
 	private static Dictionary<string, EntityDefinition> LoadEntities(List<FileInfo> entityFiles)

@@ -6,5 +6,5 @@
 #{components [test]}
 
 {render
-	(draw-grid-color (get x) (get y) red)
+	(draw-grid-sprite (get x) (get y) slime)
 }
