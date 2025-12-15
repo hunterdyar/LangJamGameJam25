@@ -35,7 +35,7 @@ public class Game : IStackContext
 
 	public void SpawnEntity(EntityDefinition definition)
 	{
-		var e = definition.GetRuntimeEntity(this);
+		var e = definition.CreateInstance(this);
 		_loadedScene.AddEntity(e);
 		e.CallOnSpawn();
 	}

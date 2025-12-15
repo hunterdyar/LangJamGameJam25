@@ -34,12 +34,12 @@ public class LJString : RuntimeObject<string>
 
 	public override bool AsBool()
 	{
-		return string.IsNullOrEmpty(_value);
+		throw new Exception("cannot implicitly convert string to bool");
 	}
 
 	public override string AsString()
 	{
-		throw new Exception("cannot implicitly convert string to bool");
+		return _value;
 	}
 }
 

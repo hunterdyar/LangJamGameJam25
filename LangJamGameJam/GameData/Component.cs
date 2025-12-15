@@ -7,10 +7,9 @@ public class Component : RuntimeBase
 	private List<Expr> _exprs;
 	private Entity _entity;
 
-	public Component(List<Expr> exprs, Entity entity, Game game) : base(game)
+	public Component(List<Expr> exprs, Game game) : base(game)
 	{
 		_exprs = exprs;
-		_entity = entity;
 		RegisterEventFunctions(_exprs);
 	}
 	
@@ -24,5 +23,10 @@ public class Component : RuntimeBase
 		{
 			return false;
 		}
+	}
+
+	public void SetEntity(Entity entity)
+	{
+		_entity = entity;
 	}
 }

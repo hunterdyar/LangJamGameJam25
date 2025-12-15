@@ -2,25 +2,21 @@
 
 namespace LangJam;
 
-public class ComponentDefinition
+public class ComponentDefinition : DefinitionBase<Component>
 {
-	public List<Expr> Roots => _roots;
-	private List<Expr> _roots;
-
-	public ComponentDefinition(List<Expr> rootExpressions)
+	public ComponentDefinition(List<Expr> rootExpressions) : base(rootExpressions)
 	{
-		_roots = rootExpressions;
 	}
 
-	public Component CreateInstance(Game game, Entity entity)
+	public override Component CreateInstance(Game game)
 	{
 		var exprs = new List<Expr>();
-		foreach (var expr in Roots)
+		foreach (var expr in RootExprs)
 		{
 			exprs.Add(expr); //todo: do we need to clone this? is the code self-modifying?
 		}
 
-		return new Component( exprs, entity, game);
+		return new Component(exprs, game);
 		//todo: run init function of the component
 	}
 }

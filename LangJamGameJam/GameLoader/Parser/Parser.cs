@@ -83,13 +83,14 @@ public class Parser
 	private AST.Expr ParseDecExpr()
 	{
 		List<AST.Expr> expressions = new List<AST.Expr>();
+		var id = _tokens.Dequeue();
 		while (_tokens.Peek().TokenType != TokenType.CloseParen)
 		{
 			expressions.Add(ParseExpression());
 		}
 
 		Consume(TokenType.CloseDeclare);
-		return new DeclareExpr(expressions);
+		return new DeclareExpr(id.Source,expressions);
 	}
 
 	private void Consume(TokenType expected)

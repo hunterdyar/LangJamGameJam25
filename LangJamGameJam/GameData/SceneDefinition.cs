@@ -2,20 +2,18 @@
 
 namespace LangJam;
 
-public class SceneDefinition
+public class SceneDefinition : DefinitionBase<Scene>
 {
-	public List<Expr> SceneLogic;
 
-	public SceneDefinition(List<Expr> exprs)
+	public SceneDefinition(List<Expr> exprs) : base(exprs)
 	{
-		SceneLogic = exprs;
 	}
 
-	public Scene CreateInstance(Game game)
+	public override Scene CreateInstance(Game game)
 	{
 		return new Scene(game)
 		{
-			SceneLogic = SceneLogic,
+			SceneLogic = RootExprs,//todo: this can be to the def.
 		};
 	}
 }

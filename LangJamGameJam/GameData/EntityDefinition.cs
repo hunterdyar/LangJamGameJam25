@@ -2,7 +2,7 @@
 
 namespace LangJam;
 
-public class EntityDefinition
+public class EntityDefinition : DefinitionBase<Entity>
 {
 	public string EntityDefName => _defName;
 	private string _defName;
@@ -10,17 +10,14 @@ public class EntityDefinition
 	private List<ComponentDefinition> RealizedCompList;
 	public bool HasRenderFunction = false;
 	private List<string> CompList;
-	private List<Expr> entityLogic;
 
-	public EntityDefinition(string entityName, List<Expr> pRootExpressions, List<string> compList)
+	public EntityDefinition(string entityName, List<Expr> pRootExpressions, List<string> compList) : base(pRootExpressions)
 	{
 		this._defName = entityName;
-		entityLogic = pRootExpressions;
 		CompList = compList;
-		
 	}
 
-	public Entity GetRuntimeEntity(Game game)
+	public override Entity CreateInstance(Game game)
 	{
 		//lazy init.
 		if (compListDirty)
@@ -48,10 +45,13 @@ public class EntityDefinition
 		};
 		foreach (var definition in RealizedCompList)
 		{
-			comps.Add(definition.CreateInstance(game, e));
+			var c = definition.CreateInstance(game);
+			c.SetEntity(e);
+			comps.Add(c);
 		}
+		
 		e.Components = comps;
-		e.RegisterEventFunctions(this.entityLogic);
+		e.RegisterEventFunctions(this.RootExprs);
 		
 		return e;
 	}

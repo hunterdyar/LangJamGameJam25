@@ -41,22 +41,24 @@ public class SExpr : Expr
 //{}
 public class DeclareExpr : SExpr
 {
-	private List<Expr> elements;
+	public readonly string Identifier;
+	public readonly Expr[] elements;
 
-	public DeclareExpr(List<Expr> expressions) : base(expressions)
+	public DeclareExpr(string identifier, List<Expr> expressions) : base(expressions)
 	{
-		elements = expressions;
+		Identifier = identifier;
+		elements = expressions.ToArray();
 	}
 
 	public override string ToString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.Append('{');
-		for (var i = 0; i < elements.Count; i++)
+		for (var i = 0; i < elements.Length; i++)
 		{
 			var e = elements[i];
 			sb.Append(e.ToString());
-			if (i < elements.Count - 1)
+			if (i < elements.Length - 1)
 			{
 				sb.Append(' ');
 			}
