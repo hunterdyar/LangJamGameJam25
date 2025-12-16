@@ -5,7 +5,6 @@ namespace LangJam.Loader.Parser;
 public class Parser
 {
 	public List<AST.Expr> RootExpressions = new List<AST.Expr>();
-
 	private Queue<Token> _tokens;
 	private string _context;
 	public void Parse(string contextName, string source)
@@ -40,6 +39,8 @@ public class Parser
 					return new NumberConstant(val);
 				}
 				return new IdentifierConstant(top.Source);
+			case TokenType.Key:
+				return new KeyExpr(top.Source);
 			case TokenType.String:
 				return new StringConstant(top.Source);
 			case TokenType.Point:
@@ -50,10 +51,10 @@ public class Parser
 				return ParseBool();
 			case TokenType.EOF:
 				throw new Exception($"Unexpected end of file in {_context}.");
+			
 		}
 
 		throw new Exception($"Unexpected token {top} in {_context}");
-
 	}
 
 	private Expr ParseBool()

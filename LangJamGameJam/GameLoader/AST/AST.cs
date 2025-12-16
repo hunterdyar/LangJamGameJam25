@@ -132,6 +132,23 @@ public class IdentifierConstant : Expr
 	}
 }
 
+public class KeyExpr : Expr
+{
+	private string _value;
+	public string Value => _value;
+
+	public KeyExpr(string val)
+	{
+		_value = val;
+	}
+
+
+	public override string ToString()
+	{
+		return ":"+_value;
+	}
+}
+
 public class StringConstant : Expr
 {
 	public string Value;

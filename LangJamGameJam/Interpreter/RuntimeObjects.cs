@@ -82,6 +82,12 @@ public class Identifier : LJString
 	public Identifier(string val) : base(val)
 	{ }
 }
+
+public class LJKey : LJString
+{
+	public LJKey(string val) : base(val)
+	{ }
+}
 public class LJNumber : RuntimeObject<double>
 {
 	public LJNumber(double val)

@@ -122,6 +122,11 @@ public class Tokenizer
 				Consume('"');
 				token = new Token(TokenType.String, data);
 				return true;
+			case ':':
+				pos++;
+				var ident = ConsumeValue();
+				token = new Token(TokenType.Key, ident);
+				return true;
 		}
 
 		if (char.IsWhiteSpace(Source[pos]))
@@ -133,7 +138,18 @@ public class Tokenizer
 			token = null;
 			return false;
 		}
-		//if we're here, it must be a value.
+
+		var value = ConsumeValue();
+		token = new Token(TokenType.Value, value);
+		if (value.Length == 0)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private string ConsumeValue()
+	{
 		_valueSB.Clear();
 		while (IsValidValueCharacter())
 		{
@@ -141,12 +157,7 @@ public class Tokenizer
 			pos++;
 		}
 
-		token = new Token(TokenType.Value, _valueSB.ToString());
-		if (_valueSB.Length == 0)
-		{
-			return false;
-		}
-		return true;
+		return _valueSB.ToString();
 	}
 
 	private StringBuilder consumeUntilSB = new StringBuilder();

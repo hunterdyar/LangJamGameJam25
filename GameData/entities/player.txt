@@ -1,16 +1,16 @@
 
 {on-spawn
-	(set x 0)
-	(set y 0)
-	(register-input-event on-left left press)
-	(register-input-event on-right right press)
+	(set :x 0)
+	(set :y 0)
+	(register-input-event :on-left :left :press)
+	(register-input-event :on-right :right :press)
 }
 #{components [test]}
 
 {render
-	(draw-grid-sprite (get x) (get y) slime)
+	(draw-grid-sprite (get :x) (get :y) :slime)
 }
 
 
-{on-left (set x(dec x))}
-{on-right (set x(inc x))}
+{on-left (set :x(dec x))}
+{on-right (set :x(inc x))}

@@ -56,6 +56,8 @@ public class Interpreter
 				//identifiers are true/false/error
 				//string is type-error.
 				break;
+			case KeyExpr keyExpr:
+				return new LJKey(keyExpr.Value);
 			case SExpr sexpr:
 				if (Builtins.BuiltinFunctions.TryGetValue(sexpr.Identifier.ToString(), out var call))
 				{
