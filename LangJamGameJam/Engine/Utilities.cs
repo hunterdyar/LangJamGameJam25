@@ -16,6 +16,9 @@ public static class Utilities
 				return Color.Blue;
 			case "red":
 				return Color.Red;
+			case "gray":
+			case "grey":
+				return Color.Gray;
 			default:
 				return Color.Magenta;
 		}

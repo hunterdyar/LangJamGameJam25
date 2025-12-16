@@ -40,6 +40,7 @@ public class Scene : RuntimeBase
 		if (!_children.Contains(entity))
 		{
 			_children.Add(entity);
+			entity.Parent = this;
 			entity.SetLoaded(true);
 		}
 		else
@@ -85,21 +86,20 @@ public class Scene : RuntimeBase
 		return true;
 	}
 
+	//todo: "call-down" for event function things.
+	public override void CallRender()
+	{
+		base.CallRender();
+		foreach (var child in _children)
+		{
+			child.CallRender();
+		}
+	}
+
 	public override string ToString()
 	{
 		return $"Scene({_definition.EntityDefName})";
 	}
-
-	//
-	// #region NativeRuntimeHelpers
-	//
-	// public bool GetScenesAt(LJPoint point, out List<Scene> entities)
-	// {
-	// 	entities = _children.Where(x=> x.Position == point).ToList();
-	// 	return entities.Any();
-	// }
-	//
-	// #endregion
 	public T? GetComponent<T>(string compName) where T : ComponentBase
 	{
 		if(Components.TryGetValue(compName, out var componentBase))

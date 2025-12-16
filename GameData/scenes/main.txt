@@ -1,18 +1,3 @@
-(components grid)
-
-{on-spawn 
-	(spawn player)
-	(set-in grid scale 100)
-	(set-in grid x-offset 10)
-	(set-in grid y-offset 30)
-	(set-in grid rows 1)
-	(set-in grid cols 5)
-	(set-in grid h-align center)
-	(set-in grid v-align middle)
+{on-spawn
+	(spawn gameplay)
 }
-
-#{render
-#	(for 0 (get-grid rows))
-#		(for 0 (get-grid cols))
-#	)
-#}row

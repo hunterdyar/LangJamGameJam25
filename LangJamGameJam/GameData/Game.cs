@@ -39,10 +39,18 @@ public class Game : IStackContext
 		_sprites = sprites;
 	}
 
-	public Scene SpawnEntity(SceneDefinition definition)
+	public Scene SpawnScene(Scene? parent, SceneDefinition? definition)
 	{
 		var e = definition.CreateInstance(this, _rootScene);
-		_rootScene.AddChild(e);
+		if (parent == null)
+		{
+			_rootScene.AddChild(e);
+		}
+		else
+		{
+			parent.AddChild(e);
+		}
+
 		e.CallOnSpawn();
 		return e;
 	}

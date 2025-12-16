@@ -8,7 +8,7 @@ public static class Builtins
 			//rendering
 			{ "draw-grid-color", RenderFunctions.DrawGridColor },
 			{ "draw-grid-sprite", RenderFunctions.DrawGridSprite},
-			
+			{ "draw-grid-circle", RenderFunctions.DrawGridCircle },
 			//core
 			{ "spawn", Spawn },
 			{ "get", Get},
@@ -146,7 +146,7 @@ public static class Builtins
 	{
 		if(context.Game.SceneDefinitions.TryGetValue(args[0].AsString(), out var val))
 		{
-			var e = context.Game.SpawnEntity(val);
+			var e = context.Game.SpawnScene(context.Scene, val);
 			return new LJSceneReference(e);
 		}
 		else

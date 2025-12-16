@@ -32,6 +32,7 @@ public static class RenderFunctions
 		var x = (int)args[1].AsNumber();
 		var y = (int)args[2].AsNumber();
 		var snamne = args[3].AsString();
+		
 
 		if(!context.Game.Sprites.TryGetValue(snamne, out var sprite))
 		{
@@ -42,6 +43,32 @@ public static class RenderFunctions
 		var dx = grid.GridInfo.XOffset + x * s;
 		var dy = grid.GridInfo.YOffset + y * s;
 		sprite.Draw(dx,dy, s);
+		return null;
+	}
+
+	public static RuntimeObject DrawGridCircle(RuntimeBase context, RuntimeObject[] args)
+	{
+		var g = ((args[0] as LJComponentReference)?.Value) as NativeComponent;
+		var grid = (NativeComps.Grid)g!;
+		if (grid == null)
+		{
+			throw new Exception("first value of draw-grid-sprite must be a reference to a grid component");
+		}
+
+		var x = (int)args[1].AsNumber();
+		var y = (int)args[2].AsNumber();
+		var p = grid.GridInfo.Scale*args[3].AsNumber();
+		var cs = args[4].AsString();
+		var c = Utilities.StringToColor(cs);
+		
+		var s = grid.GridInfo.Scale;
+		var dx = grid.GridInfo.XOffset + x * s+grid.GridInfo.Scale/2;
+		var dy = grid.GridInfo.YOffset + y * s+grid.GridInfo.Scale/2;
+		Raylib_cs.Raylib.DrawCircle(
+			dx,
+			dy,
+			(float)p/2f,
+			c);
 		return null;
 	}
 }

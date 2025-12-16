@@ -184,7 +184,7 @@ public class Tokenizer
 			return false;
 		}
 		var c = Source[pos];
-		return char.IsAsciiLetterOrDigit(c) || c == '-' || c == '_' || c == ':';
+		return char.IsAsciiLetterOrDigit(c) || c == '-' || c == '_' || c == '.';
 	}
 
 	private void ConsumeWhitespace()

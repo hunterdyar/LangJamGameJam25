@@ -54,6 +54,7 @@ public class SceneDefinition
 		{
 			var c = definition.CreateInstance(game, e);
 			comps.Add(c.Name(),c);
+			e.Properties.Add(c.Name(), new LJComponentReference(c));
 		}
 
 		e.Components = comps;
