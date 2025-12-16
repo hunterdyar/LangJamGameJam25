@@ -23,7 +23,26 @@ public static class Builtins
 			//math
 			{ "inc", MathFunctions.Increment},
 			{ "dec", MathFunctions.Decrement},
+			
+			//compare
+			{ "gt", MathFunctions.BinComp(((a , b) => a>b))},
+			{ "greater-than", MathFunctions.BinComp(((a , b) => a>b))},
+			{ "gte", MathFunctions.BinComp(((a , b) => a>=b))},
+			{ "greater-than-equal", MathFunctions.BinComp(((a , b) => a>=b))},
+			{ "lt", MathFunctions.BinComp(((a , b) => a<b))},
+			{ "less-than", MathFunctions.BinComp(((a , b) => a<b))},
+			{ "lte", MathFunctions.BinComp(((a , b) => a<=b))},
+			{ "less-than-equal", MathFunctions.BinComp(((a , b) => a<=b))},
+			{ "eq", IsEqualTo},
+			{ "equal", IsEqualTo}
 		};
+
+	private static RuntimeObject? IsEqualTo(RuntimeBase context, RuntimeObject[] args)
+	{
+		var a = args[0];
+		var b = args[1];
+		return new LJBool(a == b);//i think we overloaded the equality things for this to work?
+	}
 
 	public static RuntimeObject? Set(RuntimeBase context, RuntimeObject[] args)
 	{

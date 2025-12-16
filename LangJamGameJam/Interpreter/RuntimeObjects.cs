@@ -111,6 +111,28 @@ public class LJNumber : RuntimeObject<double>
 	}
 }
 
+public class LJBool: RuntimeObject<bool>
+{
+	public LJBool(bool val)
+	{
+		_value = val;
+	}
+	public override double AsNumber()
+	{
+		return _value ? 1 : 0;
+	}
+
+	public override string AsString()
+	{
+		return _value ? "true" : "false";
+	}
+
+	public override bool AsBool()
+	{
+		return _value;
+	}
+}
+
 public class LJPoint : RuntimeObject<(double X, double Y)>
 {
 	public LJNumber X
