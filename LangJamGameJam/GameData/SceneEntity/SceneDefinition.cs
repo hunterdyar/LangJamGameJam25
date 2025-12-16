@@ -4,7 +4,6 @@ namespace LangJam;
 
 public class SceneDefinition : DefinitionBase<Scene>
 {
-
 	public SceneDefinition(List<Expr> exprs) : base(exprs)
 	{
 	}

@@ -11,10 +11,10 @@ public static class GameLoader
 			throw new Exception($"Can't load game, directory {gameDir.Name} does nto exist");
 		}
 
-		List<FileInfo> _entityFiles = new List<FileInfo>();
-		List<FileInfo> _componentsFiles = new List<FileInfo>();
-		List<FileInfo> _sceneFiles = new List<FileInfo>();
-		List<FileInfo> _spriteFiles = new List<FileInfo>();
+		List<FileInfo> entityFiles = new List<FileInfo>();
+		List<FileInfo> componentsFiles = new List<FileInfo>();
+		List<FileInfo> sceneFiles = new List<FileInfo>();
+		List<FileInfo> spriteFiles = new List<FileInfo>();
 		//other resources?
 		
 		foreach (var dirInfo in gameDir.EnumerateDirectories("*", SearchOption.AllDirectories))
@@ -23,34 +23,34 @@ public static class GameLoader
 			{
 				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
 				{
-					_entityFiles.Add(info);
+					entityFiles.Add(info);
 				}
 			}else if (dirInfo.Name == "components")
 			{
 				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
 				{
-					_componentsFiles.Add(info);
+					componentsFiles.Add(info);
 				}
 			}else if (dirInfo.Name == "scenes")
 			{
 				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
 				{
-					_sceneFiles.Add(info);
+					sceneFiles.Add(info);
 				}
 			}else if (dirInfo.Name == "sprites")
 			{
 				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
 				{
-					_spriteFiles.Add(info);
+					spriteFiles.Add(info);
 				}
 			}
 		}
 
 		Game game = new Game();
-		game.SetComponentDefinitions(LoadComponents(_componentsFiles));
-		game.SetSceneDefinitions(LoadScenes(_sceneFiles));
-		game.SetEntityDefinitions(LoadEntities(_entityFiles));
-		game.SetSprites(LoadSprites(_spriteFiles));
+		game.SetComponentDefinitions(LoadComponents(componentsFiles));
+		game.SetSceneDefinitions(LoadScenes(sceneFiles));
+		game.SetEntityDefinitions(LoadEntities(entityFiles));
+		game.SetSprites(LoadSprites(spriteFiles));
 		if (game.SceneDefinitions.TryGetValue("main", out var mainScene))
 		{
 			game.LoadScene(mainScene);
@@ -96,18 +96,37 @@ public static class GameLoader
 
 	private static Dictionary<string, EntityDefinition> LoadEntities(List<FileInfo> entityFiles)
 	{
-		Dictionary<string, EntityDefinition> entities = new Dictionary<string, EntityDefinition>();
+		Dictionary<string, EntityDefinition> entityDefs = new Dictionary<string, EntityDefinition>();
 		foreach (var fileInfo in entityFiles)
 		{
 			var contents = fileInfo.OpenText().ReadToEnd();
 			var p = new Parser.Parser();
 			p.Parse(fileInfo.Name, contents);
 			var eName = Path.GetFileNameWithoutExtension(fileInfo.Name).ToLower();
+			
 			//todo: comp list is special?
-			entities.Add(eName, new EntityDefinition(eName, p.RootExpressions, new List<string>()));
+			var comps = p.RootExpressions.Cast<SExpr>().Where(x => x.Key != null && x.Key.Value == "components");
+			List<string> compNames = new List<string>();
+			if (comps.Any())
+			{
+				foreach (var compExpression in comps)
+				{
+					for (var i = 1; i < compExpression.elements.Count; i++)//start at 1 to skip "components"
+					{
+						var comp = compExpression.elements[i];
+						var c = comp.ToString();
+						if (!string.IsNullOrEmpty(c) )
+						{
+							compNames.Add(c); //should this be comp
+						}
+					}
+				}
+			}
+			
+			entityDefs.Add(eName, new EntityDefinition(eName, p.RootExpressions, compNames));
 		}
 
-		return entities;
+		return entityDefs;
 	}
 
 	private static Dictionary<string, SceneDefinition> LoadScenes(List<FileInfo> sceneFiles)

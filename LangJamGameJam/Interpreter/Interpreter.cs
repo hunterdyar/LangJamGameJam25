@@ -48,6 +48,10 @@ public class Interpreter
 					}
 					call?.Invoke(context, args);
 				}
+				else
+				{
+					throw new Exception($"Unknown call to '{id} for {context}");
+				}
 				//check if there are constants...
 				break;
 			break;

@@ -7,8 +7,7 @@ namespace LangJam;
 public class Entity : RuntimeBase
 {
 	public LJPoint Position => new LJPoint(Properties["x"].AsNumber(), Properties["y"].AsNumber());
-		
-		
+	
 		//an entity is a list of components and properties.
 		//the system loops through all entities, and, for each component, calls the appropriate hooks with the entity properties as part of the stack context.
 		//so like, basically 'object oriented' ish?

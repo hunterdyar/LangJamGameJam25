@@ -24,7 +24,7 @@ internal static class Program
 			Raylib.BeginDrawing();
 			Raylib.ClearBackground(Color.White);//game.loadedscene.backgroundColor
 
-			Raylib.DrawText("Hello, world!", 12, 12, 20, Color.Black);
+			// Raylib.DrawText("Hello, world!", 12, 12, 20, Color.Black);
 			game.Tick();
 
 			Raylib.EndDrawing();

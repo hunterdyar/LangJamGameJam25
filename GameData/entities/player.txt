@@ -3,14 +3,15 @@
 	(set x 0)
 	(set y 0)
 	(register-input-event on-left left press)
+	(register-input-event on-left a press)
 	(register-input-event on-right right press)
+	(register-input-event on-right d press)
 }
-#{components [test]}
+(components test)
 
 {render
 	(draw-grid-sprite (get x) (get y) slime)
 }
-
 
 {on-left
  (if (gt :x 0)
@@ -19,7 +20,7 @@
 }
 
 {on-right
-(if (lt :x (get-grid cols))
-    (set x (inc :x))
-)
+	(if (lt :x (get-grid cols))
+		(set x (inc :x))
+	)
 }

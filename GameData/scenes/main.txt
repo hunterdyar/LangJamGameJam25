@@ -7,7 +7,6 @@
 (set-grid h-align center)
 (set-grid v-align middle)
 
-
 #{render
 #	(for 0 (get-grid rows))
 #		(for 0 (get-grid cols))
