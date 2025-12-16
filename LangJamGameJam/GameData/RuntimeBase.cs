@@ -1,4 +1,5 @@
 ﻿using LangJam.Loader.AST;
+using Microsoft.VisualBasic;
 
 namespace LangJam;
 
@@ -6,6 +7,8 @@ public abstract class RuntimeBase : IStackContext
 {
 	public Dictionary<string, RuntimeObject> Properties = new Dictionary<string, RuntimeObject>();
 	//todo:ExpressionBody Type
+	public Dictionary<string, DeclareExpr> Methods = new Dictionary<string, DeclareExpr>();
+	
 	public Expr[]? RenderCall;
 	public Expr[]? OnSpawn;
 	public Expr[]? OnEnable;
@@ -30,19 +33,29 @@ public abstract class RuntimeBase : IStackContext
 		{
 			if (expression is DeclareExpr decExpr)
 			{
-				switch (decExpr.Identifier.ToString())
+				var id = decExpr.Identifier.ToString();
+				
+				//we just add to the Methods dictionary. the others are cache for the hot-path, or because i felt like it.
+				switch (id)
 				{
 					case "render":
 						RenderCall = decExpr.elements;
+						Methods.Add(id, decExpr);
 						break;
 					case "on-spawn":
 						OnSpawn = decExpr.elements;
+						Methods.Add(id, decExpr);
 						break;
 					case "on-enable":
 						OnEnable = decExpr.elements;
+						Methods.Add(id, decExpr);
 						break;
 					case "on-disable":
 						OnDisable = decExpr.elements;
+						Methods.Add(id, decExpr);
+						break;
+					default:
+						Methods.Add(id, decExpr);
 						break;
 				}
 			}
@@ -101,6 +114,13 @@ public abstract class RuntimeBase : IStackContext
 		}
 	}
 
+	public void WalkDeclaredExpr(DeclareExpr expr)
+	{
+		for (int i = 0; i < expr.elements.Length; i++)
+		{
+			_game.WalkStatement(expr.elements[i], this);
+		}
+	}
 	private void WalkExpressionArray(Expr[] exprs)
 	{
 		for (int i = 0; i < exprs.Length; i++)

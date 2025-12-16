@@ -1,4 +1,4 @@
-(spawn player)
+(spawn ~player)
 (set-grid scale 100)
 (set-grid x-offset 10)
 (set-grid y-offset 30)

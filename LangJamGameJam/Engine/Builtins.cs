@@ -5,13 +5,24 @@ public static class Builtins
 	public static Dictionary<string, Func<RuntimeBase, RuntimeObject[], RuntimeObject?>> BuiltinFunctions =
 		new Dictionary<string, Func<
 			RuntimeBase, RuntimeObject[], RuntimeObject?>>{
+			//rendering
 			{ "draw-grid-color", RenderFunctions.DrawGridColor },
 			{ "draw-grid-sprite", RenderFunctions.DrawGridSprite},
+			
+			//core
 			{ "spawn", Spawn },
 			{ "get", Get},
 			{ "set", Set},
+			{"register-input-event", RegisterInputEvent},
+			{"unregister-input-event", UnregisterInputEvent },
+
+			//grid
 			{ "get-grid", GridFunctions.GetGrid},
-			{"set-grid", GridFunctions.SetGrid},
+			{ "set-grid", GridFunctions.SetGrid},
+			
+			//math
+			{ "inc", MathFunctions.Increment},
+			{ "dec", MathFunctions.Decrement},
 		};
 
 	public static RuntimeObject? Set(RuntimeBase context, RuntimeObject[] args)
@@ -27,7 +38,7 @@ public static class Builtins
 			context.Properties[key] = val;
 		}
 
-		return null;
+		return val;
 	}
 
 	public static RuntimeObject? Get(RuntimeBase context, RuntimeObject[] args)
@@ -48,7 +59,8 @@ public static class Builtins
 	{
 		if(context.Game.Prototypes.TryGetValue(args[0].AsString(), out var val))
 		{
-			context.Game.SpawnEntity(val);
+			var e = context.Game.SpawnEntity(val);
+			return new LJEntityReference(e);
 		}
 		else
 		{
@@ -62,6 +74,44 @@ public static class Builtins
 		var shouldBeEnabled = args[1].AsBool();
 		context.SetEnabled(shouldBeEnabled);
 		
+		return null;
+	}
+
+	public static RuntimeObject? RegisterInputEvent(RuntimeBase context, RuntimeObject[] args)
+	{
+		var funcName = args[0].AsString();
+		var keyName = args[1].AsString();
+		var keyState = args[2].AsString();
+		
+		//funcName to decExpr
+		if (context.Methods.TryGetValue(funcName, out var declareExpr))
+		{
+			context.Game.InputSystem.RegisterInputEvent(context, declareExpr, keyName, keyState);
+		}
+		else
+		{
+			throw new Exception($"Unable to register input event, unknown method {funcName} on {context}");
+		}
+
+		return null;
+	}
+
+	public static RuntimeObject? UnregisterInputEvent(RuntimeBase context, RuntimeObject[] args)
+	{
+		var funcName = args[0].AsString();
+		var keyName = args[1].AsString();
+		var keyState = args[2].AsString();
+
+		//funcName to decExpr
+		if (context.Methods.TryGetValue(funcName, out var declareExpr))
+		{
+			context.Game.InputSystem.UnregisterInputEvent(context, declareExpr, keyName, keyState);
+		}
+		else
+		{
+			throw new Exception($"Unable to register input event, unknown method {funcName} on {context}");
+		}
+
 		return null;
 	}
 }

@@ -158,6 +158,11 @@ public class LJSprite : RuntimeObject<Raylib_cs.RenderTexture2D>
 }
 public class LJEntityReference : RuntimeObject<Entity>
 {
+	public LJEntityReference(Entity entity)
+	{
+		_value = entity;
+	}
+
 	public override double AsNumber()
 	{
 		throw new NotImplementedException();
@@ -171,5 +176,23 @@ public class LJEntityReference : RuntimeObject<Entity>
 	public override bool AsBool()
 	{
 		throw new NotImplementedException();
+	}
+}
+
+public class LJList : RuntimeObject<List<RuntimeObject>>
+{
+	public override double AsNumber()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override string AsString()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override bool AsBool()
+	{
+		return _value.Count == 0;
 	}
 }

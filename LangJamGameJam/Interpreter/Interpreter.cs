@@ -41,7 +41,14 @@ public class Interpreter
 			case StringConstant stringConstant:
 				return stringConstant.RuntimeValue;
 			case IdentifierConstant identifier:
-				return new Identifier(identifier.ToString());
+				if (context.TryGetProperty(identifier.ToString(), out var value))
+				{
+					return value;
+				}
+				else
+				{
+					throw new Exception($"Unable to get variable {identifier} on {context}");
+				}
 			case BooleanExpr booleanExpr:
 				var o = WalkExpression(booleanExpr.Expr, context);
 				//if it's a list, false for empty true for contains

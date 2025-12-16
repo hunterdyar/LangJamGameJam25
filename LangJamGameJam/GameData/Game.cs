@@ -6,6 +6,8 @@ namespace LangJam;
 public class Game : IStackContext
 {
 	//interpreter things
+	public InputSystem InputSystem => _inputSystem;
+	private InputSystem _inputSystem;
 	private Interpreter _interpreter;
 	//list of sprite data
 	//list of level data
@@ -26,6 +28,7 @@ public class Game : IStackContext
 	public Game()
 	{
 		_interpreter = new Interpreter();
+		_inputSystem = new InputSystem();
 	}
 	public void SetComponentDefinitions(Dictionary<string, ComponentDefinition> components)
 	{
@@ -42,11 +45,12 @@ public class Game : IStackContext
 		_sprites = sprites;
 	}
 
-	public void SpawnEntity(EntityDefinition definition)
+	public Entity SpawnEntity(EntityDefinition definition)
 	{
 		var e = definition.CreateInstance(this, _loadedScene);
 		_loadedScene.AddEntity(e);
 		e.CallOnSpawn();
+		return e;
 	}
 
 	public void WalkStatement(Expr expr, RuntimeBase context)
@@ -68,6 +72,7 @@ public class Game : IStackContext
 	//called by render method.
 	public void Tick()
 	{
+		_inputSystem.Tick();
 		_loadedScene.Tick();
 	}
 
