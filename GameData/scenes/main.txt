@@ -1,12 +1,11 @@
 {on-spawn
-	(spawn gameplay)
-	(spawn ui)
+	(set gameplay (spawn gameplay))
+	(set ui (spawn ui))
 	(register-input-event handle-on-left left press)
 	(register-input-event handle-on-left a press)
 	(register-input-event handle-on-right right press)
 	(register-input-event handle-on-right d press)
 }
 
-
-{handle-on-left (invoke on-left)}
-{handle-on-right (invoke on-right)}
+{handle-on-left (invoke on-input-left)}
+{handle-on-right (invoke on-input-right)}

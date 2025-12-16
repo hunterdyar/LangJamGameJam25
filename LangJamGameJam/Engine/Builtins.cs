@@ -16,6 +16,7 @@ public static class Builtins
 			{ "set", Set},
 			{ "set-in", SetIn },
 			{ "invoke", Invoke},
+			{ "call", Call },
 			{ "range", Range},
 			//input
 			{"register-input-event", RegisterInputEvent},
@@ -73,6 +74,21 @@ public static class Builtins
 	{
 		var a = args[0].AsString();
 		context.Scene.CallMethodRecursive(a);
+		return null;
+	}
+
+	private static RuntimeObject? Call(RuntimeBase context, RuntimeObject[] args)
+	{
+		var cont = args[0] as LJRuntimeBaseReference;
+		if (cont == null)
+		{
+			throw new Exception($"Unable to call on {args[0]}. expected scene or component reference");
+		}
+		var func = args[1].AsString();
+		if(cont.Value.Scene.Methods.TryGetValue(func, out var e))
+		{
+			cont.Value.Scene.WalkDeclaredExpr(e);	
+		}
 		return null;
 	}
 
@@ -188,7 +204,8 @@ public static class Builtins
 		}
 		else
 		{
-			throw new Exception($"Unable to spawn entity {args[0].ToString()}");
+			throw new Exception($"" +
+			                    $"Unable to spawn entity {args[0].AsString()}");
 		}
 		return null;
 	}

@@ -11,35 +11,29 @@ public static class GameLoader
 			throw new Exception($"Can't load game, directory {gameDir.Name} does nto exist");
 		}
 
-		List<FileInfo> entityFiles = new List<FileInfo>();
 		List<FileInfo> componentsFiles = new List<FileInfo>();
 		List<FileInfo> sceneFiles = new List<FileInfo>();
 		List<FileInfo> spriteFiles = new List<FileInfo>();
 		//other resources?
 		
+		//todo: what's top-level and what's recursive? (org/type vs type/org)
 		foreach (var dirInfo in gameDir.EnumerateDirectories("*", SearchOption.AllDirectories))
 		{
-			if (dirInfo.Name == "entities")
+			if (dirInfo.Name == "components")
 			{
-				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
-				{
-					entityFiles.Add(info);
-				}
-			}else if (dirInfo.Name == "components")
-			{
-				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
+				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories))
 				{
 					componentsFiles.Add(info);
 				}
 			}else if (dirInfo.Name == "scenes")
 			{
-				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
+				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories))
 				{
 					sceneFiles.Add(info);
 				}
 			}else if (dirInfo.Name == "sprites")
 			{
-				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
+				foreach (var info in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories))
 				{
 					spriteFiles.Add(info);
 				}

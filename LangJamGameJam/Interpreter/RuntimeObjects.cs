@@ -210,11 +210,11 @@ public class LJRuntimeBaseReference : RuntimeObject<RuntimeBase>{
 		throw new NotImplementedException();
 	}
 }
-public class LJSceneReference : RuntimeObject<Scene>
+public class LJSceneReference : LJRuntimeBaseReference
 {
-	public LJSceneReference(Scene entity)
+	public LJSceneReference(Scene entity) : base(entity)
 	{
-		_value = entity;
+		
 	}
 
 	public override double AsNumber()
@@ -243,7 +243,6 @@ public class LJComponentReference : LJRuntimeBaseReference
 	private ComponentBase _componentBase;
 	public LJComponentReference(ComponentBase componentBase) : base(componentBase)
 	{
-		_value = componentBase;
 	}
 }
 
