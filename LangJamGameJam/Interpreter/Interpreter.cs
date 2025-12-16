@@ -4,6 +4,24 @@ using LangJam.Loader.AST;
 
 public class Interpreter
 {
+
+	private void CFIf(SExpr sexpr, RuntimeBase context)
+	{
+		//id ("if") is 0
+		var compare = WalkExpression(sexpr.elements[1], context);
+		if (compare.AsBool())
+		{
+			WalkExpression(sexpr.elements[2], context);
+		}
+		else
+		{
+			if (sexpr.elements.Count == 4)//if,comp,cons,alt
+			{
+				WalkExpression(sexpr.elements[3], context);
+			}
+		}
+	}
+
 	public void WalkStatement(Expr expr, RuntimeBase context)
 	{
 		switch (expr)
@@ -14,6 +32,12 @@ public class Interpreter
 				break;
 			case SExpr sexpr:
 				var id = sexpr.Key.Value.ToString();
+				switch (id)
+				{
+					case "if":
+						CFIf(sexpr, context);
+					return;
+				}
 				if (Builtins.BuiltinFunctions.TryGetValue(id, out var call))
 				{
 					var args = new RuntimeObject[sexpr.elements.Count-1];

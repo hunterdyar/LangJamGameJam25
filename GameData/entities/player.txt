@@ -12,5 +12,14 @@
 }
 
 
-{on-left (set x (dec :x))}
-{on-right (set x (inc :x))}
+{on-left
+ (if (gt :x 0)
+	(set x (dec :x))
+  )
+}
+
+{on-right
+(if (lt :x (get-grid cols))
+    (set x (inc :x))
+)
+}
