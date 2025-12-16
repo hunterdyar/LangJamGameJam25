@@ -77,6 +77,27 @@ public class Scene : RuntimeBase
 		}
 	}
 
+	public void CallMethodRecursive(string methodName)
+	{
+		if (Methods.TryGetValue(methodName, out var expr))
+		{
+			WalkDeclaredExpr(expr);
+		}
+
+		foreach (var kvp in Components)
+		{
+			if(kvp.Value.Methods.TryGetValue(methodName, out var cexpr))
+			{
+				WalkDeclaredExpr(cexpr);
+			}
+		}
+
+		foreach (var child in _children)
+		{
+			child.CallMethodRecursive(methodName);
+		}
+	}
+
 	public override bool TryGetProperty(string id, out RuntimeObject ro)
 	{
 		if (!Properties.TryGetValue(id, out ro))

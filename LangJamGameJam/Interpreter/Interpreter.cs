@@ -4,7 +4,7 @@ using LangJam.Loader.AST;
 
 public class Interpreter
 {
-
+	//control-flow if
 	private void CFIf(SExpr sexpr, RuntimeBase context)
 	{
 		//id ("if") is 0
@@ -22,6 +22,23 @@ public class Interpreter
 		}
 	}
 
+	private void CFFor(SExpr sexpr, RuntimeBase context)
+	{
+		//id ("for") is 0
+		var iterName = WalkExpression(sexpr.elements[1], context).AsString();
+		var range = WalkExpression(sexpr.elements[2], context).AsList().Value;
+		foreach (var ro in range)
+		{
+			//todo: stacks! for loops operate on entity variables.
+			context.SetProperty(iterName, ro);
+			//(0.for 1.varname 2.range 3.then 4.do 5.the 6.rest)
+			for (int i = 0; i < sexpr.elements.Count; i++)
+			{
+				WalkStatement(sexpr.elements[i], context);
+			}
+		}
+	}
+
 	public void WalkStatement(Expr expr, RuntimeBase context)
 	{
 		switch (expr)
@@ -35,7 +52,10 @@ public class Interpreter
 				{
 					case "if":
 						CFIf(sexpr, context);
-					return;
+						return;
+					case "for":
+						CFFor(sexpr, context);
+						return;
 				}
 				if (Builtins.BuiltinFunctions.TryGetValue(id, out var call))
 				{

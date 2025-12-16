@@ -1,0 +1,18 @@
+(components grid)
+
+{on-spawn 
+	(spawn player)
+	(set-in grid scale 100)
+	(set-in grid x-offset 0)
+	(set-in grid y-offset -100)
+	(set-in grid rows 1)
+	(set-in grid cols 5)
+	(set-in grid h-align center)
+	(set-in grid v-align middle)
+}
+
+{render
+	(for i (range 0 5)
+		(draw-grid-circle :grid :i 0 0.5 grey)
+	)
+}

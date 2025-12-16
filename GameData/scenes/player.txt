@@ -2,10 +2,6 @@
 {on-spawn
 	(set x 0)
 	(set y 0)
-	(register-input-event on-left left press)
-	(register-input-event on-left a press)
-	(register-input-event on-right right press)
-	(register-input-event on-right d press)
 	(set g (find-comp-in-parent grid))
 }
 

@@ -36,9 +36,9 @@ public class GridInfo
 			case HAlignment.Left:
 				return _xOff;
 			case HAlignment.Right:
-				return Raylib_cs.Raylib.GetScreenWidth() - Cols * Scale;
+				return Raylib_cs.Raylib.GetScreenWidth() - Cols * Scale + _xOff;
 			case HAlignment.Center:
-				return Raylib_cs.Raylib.GetScreenWidth()/2 - (Cols * Scale)/2;
+				return Raylib_cs.Raylib.GetScreenWidth()/2 - (Cols * Scale)/2 + _xOff;
 		}
 
 		return _xOff;
@@ -51,9 +51,9 @@ public class GridInfo
 			case VAlignment.Top:
 				return _xOff;
 			case VAlignment.Middle:
-				return Raylib_cs.Raylib.GetScreenHeight()/2 - (Rows * Scale)/2;
+				return Raylib_cs.Raylib.GetScreenHeight()/2 - (Rows * Scale)/2 + _yOff;
 			case VAlignment.Bottom:
-				return Raylib_cs.Raylib.GetScreenHeight() - (Rows * Scale);
+				return Raylib_cs.Raylib.GetScreenHeight() - (Rows * Scale) + _yOff;
 		}
 
 		return _xOff;

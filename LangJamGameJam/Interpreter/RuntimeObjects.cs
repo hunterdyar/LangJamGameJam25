@@ -6,6 +6,11 @@ public abstract class RuntimeObject
 	public abstract double AsNumber();
 	public abstract string AsString();
 	public abstract bool AsBool();
+
+	public virtual LJList AsList()
+	{
+		throw new Exception("unable to convert object to list/range");
+	}
 }
 public abstract class RuntimeObject<T> : RuntimeObject, IEquatable<RuntimeObject<T>>
 {
@@ -226,6 +231,11 @@ public class LJSceneReference : RuntimeObject<Scene>
 	{
 		throw new NotImplementedException();
 	}
+
+	public override LJList AsList()
+	{
+		throw new Exception("todo: iterate through children");
+	}
 }
 
 public class LJComponentReference : LJRuntimeBaseReference
@@ -239,6 +249,15 @@ public class LJComponentReference : LJRuntimeBaseReference
 
 public class LJList : RuntimeObject<List<RuntimeObject>>
 {
+	public LJList()
+	{
+		_value = new List<RuntimeObject>();
+	}
+
+	public LJList(List<RuntimeObject> list)
+	{
+		_value = list;
+	}
 	public override double AsNumber()
 	{
 		throw new NotImplementedException();
@@ -252,5 +271,10 @@ public class LJList : RuntimeObject<List<RuntimeObject>>
 	public override bool AsBool()
 	{
 		return _value.Count == 0;
+	}
+
+	public override LJList AsList()
+	{
+		return this;
 	}
 }

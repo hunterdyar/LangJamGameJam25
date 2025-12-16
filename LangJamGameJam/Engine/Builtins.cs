@@ -15,6 +15,8 @@ public static class Builtins
 			{ "get-from", GetFrom},
 			{ "set", Set},
 			{ "set-in", SetIn },
+			{ "invoke", Invoke},
+			{ "range", Range},
 			//input
 			{"register-input-event", RegisterInputEvent},
 			{"unregister-input-event", UnregisterInputEvent },
@@ -38,6 +40,41 @@ public static class Builtins
 			{ "eq", IsEqualTo},
 			{ "equal", IsEqualTo}
 		};
+
+	private static RuntimeObject? Range(RuntimeBase context, RuntimeObject[] args)
+	{
+		double fromInc = 0;
+		double toExc = 0;
+		double inc = 1;
+		if (args.Length == 3)
+		{
+			fromInc = args[0].AsNumber();
+			toExc = args[1].AsNumber();
+			inc = args[2].AsNumber();
+		}else if (args.Length == 2)
+		{
+			fromInc = args[0].AsNumber();
+			toExc = args[1].AsNumber();
+		}else if (args.Length == 1)
+		{
+			toExc = args[1].AsNumber();
+		}
+
+		var list = new LJList();
+		for (double i = fromInc; i < toExc; i+=inc)
+		{
+			list.Value.Add(new LJNumber(i));
+		}
+
+		return list;
+	}
+
+	private static RuntimeObject? Invoke(RuntimeBase context, RuntimeObject[] args)
+	{
+		var a = args[0].AsString();
+		context.Scene.CallMethodRecursive(a);
+		return null;
+	}
 
 	private static RuntimeObject? IsEqualTo(RuntimeBase context, RuntimeObject[] args)
 	{
