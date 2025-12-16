@@ -1,15 +1,15 @@
-(spawn :player)
-(set-grid :scale 100)
-(set-grid :x-offset 10)
-(set-grid :y-offset 30)
-(set-grid :rows 1)
-(set-grid :cols 3)
-(set-grid :h-align :center)
-(set-grid :v-align :middle)
+(spawn player)
+(set-grid scale 100)
+(set-grid x-offset 10)
+(set-grid y-offset 30)
+(set-grid rows 1)
+(set-grid cols 3)
+(set-grid h-align center)
+(set-grid v-align middle)
 
 
 #{render
-#	(for 0 (get-grid :rows))
-#		(for 0 (get-grid :cols))
+#	(for 0 (get-grid rows))
+#		(for 0 (get-grid cols))
 #	)
 #}row

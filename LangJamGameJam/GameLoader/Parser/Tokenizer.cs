@@ -125,7 +125,7 @@ public class Tokenizer
 			case ':':
 				pos++;
 				var ident = ConsumeValue();
-				token = new Token(TokenType.Key, ident);
+				token = new Token(TokenType.Identifier, ident);
 				return true;
 		}
 
@@ -140,7 +140,7 @@ public class Tokenizer
 		}
 
 		var value = ConsumeValue();
-		token = new Token(TokenType.Value, value);
+		token = new Token(TokenType.Key, value);
 		if (value.Length == 0)
 		{
 			return false;

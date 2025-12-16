@@ -12,7 +12,7 @@ public enum TokenType
 	OpenDeclare,
 	CloseDeclare,
 	String,
-	Value,
+	Identifier,
 	Key,
 	EOF,
 }

@@ -10,13 +10,13 @@ public class Expr
 //()
 public class SExpr : Expr
 {
-	public IdentifierConstant? Identifier;
+	public KeyExpr? Key;
 	public List<Expr> elements = new List<Expr>();
 
 	public SExpr(List<Expr> expressions)
 	{
 		elements = expressions;
-		Identifier = elements.Count > 0 ? elements[0] as IdentifierConstant : null;
+		Key = elements.Count > 0 ? elements[0] as KeyExpr : null;
 	}
 
 	public override string ToString()
@@ -119,7 +119,7 @@ public class NumberConstant : Expr
 
 public class IdentifierConstant : Expr
 {
-	private string Value;
+	public string Value;
 
 	public IdentifierConstant(string s)
 	{
@@ -128,7 +128,7 @@ public class IdentifierConstant : Expr
 
 	public override string ToString()
 	{
-		return Value;
+		return ":"+Value;
 	}
 }
 
@@ -145,7 +145,7 @@ public class KeyExpr : Expr
 
 	public override string ToString()
 	{
-		return ":"+_value;
+		return _value;
 	}
 }
 

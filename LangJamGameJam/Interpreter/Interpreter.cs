@@ -13,7 +13,7 @@ public class Interpreter
 			throw new NotImplementedException();
 				break;
 			case SExpr sexpr:
-				var id = sexpr.Identifier.ToString();
+				var id = sexpr.Key.Value.ToString();
 				if (Builtins.BuiltinFunctions.TryGetValue(id, out var call))
 				{
 					var args = new RuntimeObject[sexpr.elements.Count-1];
@@ -41,7 +41,7 @@ public class Interpreter
 			case StringConstant stringConstant:
 				return stringConstant.RuntimeValue;
 			case IdentifierConstant identifier:
-				if (context.TryGetProperty(identifier.ToString(), out var value))
+				if (context.TryGetProperty(identifier.Value.ToString(), out var value))
 				{
 					return value;
 				}
@@ -59,7 +59,7 @@ public class Interpreter
 			case KeyExpr keyExpr:
 				return new LJKey(keyExpr.Value);
 			case SExpr sexpr:
-				if (Builtins.BuiltinFunctions.TryGetValue(sexpr.Identifier.ToString(), out var call))
+				if (Builtins.BuiltinFunctions.TryGetValue(sexpr.Key.ToString(), out var call))
 				{
 					var args = new RuntimeObject[sexpr.elements.Count - 1];
 					for (int i = 1; i < sexpr.elements.Count; i++)
@@ -80,7 +80,7 @@ public class Interpreter
 				}
 				else
 				{
-					throw new Exception($"unknown call to {sexpr.Identifier.ToString()}");
+					throw new Exception($"unknown call to {sexpr.Key.ToString()}");
 				}
 				break;
 		}

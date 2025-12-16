@@ -33,13 +33,17 @@ public class Parser
 				return ParseSExpr();
 			case TokenType.OpenDeclare:
 				return ParseDecExpr();
-			case TokenType.Value:
+			case TokenType.Identifier:
 				if (double.TryParse(top.Source, out var val))
 				{
 					return new NumberConstant(val);
 				}
 				return new IdentifierConstant(top.Source);
 			case TokenType.Key:
+				if (double.TryParse(top.Source, out var n))
+				{
+					return new NumberConstant(n);
+				}
 				return new KeyExpr(top.Source);
 			case TokenType.String:
 				return new StringConstant(top.Source);
