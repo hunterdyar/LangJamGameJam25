@@ -32,7 +32,6 @@ public static class RenderFunctions
 		var x = (int)args[1].AsNumber();
 		var y = (int)args[2].AsNumber();
 		var snamne = args[3].AsString();
-		
 
 		if(!context.Game.Sprites.TryGetValue(snamne, out var sprite))
 		{
@@ -42,7 +41,7 @@ public static class RenderFunctions
 		var s = grid.GridInfo.Scale;
 		var dx = grid.GridInfo.XOffset + x * s;
 		var dy = grid.GridInfo.YOffset + y * s;
-		sprite.Draw(dx,dy);
+		sprite.Draw(dx,dy, s);
 		return null;
 	}
 }

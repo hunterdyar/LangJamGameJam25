@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using System.Numerics;
+using Raylib_cs;
 
 namespace LangJam;
 
@@ -17,9 +18,11 @@ public class Sprite
 		Tint = Color.White;
 	}
 
-	public void Draw(int px, int py)
+	public void Draw(int px, int py, int scale)
 	{
-		Raylib.DrawTexture(Texture, px, py, Tint);
+		float s = (float)scale/Texture.Width;
+		Raylib.DrawTextureEx(Texture, new Vector2(px,py),0,s,Tint);
+		//Raylib.DrawTexture(Texture, px, py, Tint);
 	}
 
 	public override string ToString()
