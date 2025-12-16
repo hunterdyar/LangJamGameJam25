@@ -9,12 +9,12 @@
 	(draw-grid-sprite :g (get x) (get y) slime)
 }
 
-{on-input-left
+{move-left
  (if (gt :x 0)
 	(set x (dec :x))
   )
 }
-{on-input-right
+{move-right
 	(if (lt :x (dec (get-from :g cols) 1))
 		(set x (inc :x))
 	)

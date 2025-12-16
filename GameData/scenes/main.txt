@@ -5,7 +5,9 @@
 	(register-input-event handle-on-left a press)
 	(register-input-event handle-on-right right press)
 	(register-input-event handle-on-right d press)
+	(register-input-event handle-on-select space press)
 }
 
 {handle-on-left (invoke on-input-left)}
 {handle-on-right (invoke on-input-right)}
+{handle-on-select (invoke on-input-select)}

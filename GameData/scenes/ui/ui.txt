@@ -1,3 +1,40 @@
-{on-spawn
-	
+(components grid)
+
+{on-spawn 
+	(set-in grid scale 75)
+	(set-in grid x-offset 0)
+	(set-in grid y-offset 50)
+	(set-in grid rows 1)
+	(set-in grid cols 3)
+	(set-in grid h-align center)
+	(set-in grid v-align middle)
+	(set card (list move-left "turn" move-right)) 
+	(set highlighted-card 1)
+}
+
+{render
+	(for i j :card
+		[
+		(if (eq :i :highlighted-card) 
+			(draw-grid-circle :grid :i 0 0.5 red)
+			(draw-grid-circle :grid :i 0 0.5 grey)
+		)
+#		(get :card :i)
+		]
+	)
+}
+
+{on-input-left
+ (if (gt :highlighted-card 0)
+	(set highlighted-card (dec :highlighted-card))
+  )
+}
+{on-input-right
+	(if (lt :highlighted-card (dec (count :card)) 1)
+		(set highlighted-card (inc :highlighted-card))
+	)
+}
+
+{on-input-select
+	(broadcast (get :card :highlighted-card))
 }

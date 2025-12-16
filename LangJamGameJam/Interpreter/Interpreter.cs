@@ -11,13 +11,13 @@ public class Interpreter
 		var compare = WalkExpression(sexpr.elements[1], context);
 		if (compare.AsBool())
 		{
-			WalkExpression(sexpr.elements[2], context);
+			WalkStatement(sexpr.elements[2], context);
 		}
 		else
 		{
 			if (sexpr.elements.Count == 4)//if,comp,cons,alt
 			{
-				WalkExpression(sexpr.elements[3], context);
+				WalkStatement(sexpr.elements[3], context);
 			}
 		}
 	}
@@ -25,16 +25,30 @@ public class Interpreter
 	private void CFFor(SExpr sexpr, RuntimeBase context)
 	{
 		//id ("for") is 0
-		var iterName = WalkExpression(sexpr.elements[1], context).AsString();
-		var range = WalkExpression(sexpr.elements[2], context).AsList().Value;
-		foreach (var ro in range)
+		//for index list do
+		if (sexpr.elements.Count == 4)
 		{
-			//todo: stacks! for loops operate on entity variables.
-			context.SetProperty(iterName, ro);
-			//(0.for 1.varname 2.range 3.then 4.do 5.the 6.rest)
-			for (int i = 0; i < sexpr.elements.Count; i++)
+			var range = WalkExpression(sexpr.elements[2], context).AsList().Value;
+			var iterName = WalkExpression(sexpr.elements[1], context).AsString();
+			foreach (var ro in range)
 			{
-				WalkStatement(sexpr.elements[i], context);
+				//todo: stacks! for loops operate on entity variables.
+				context.SetProperty(iterName, ro);
+				WalkStatement(sexpr.elements[3], context);
+			}
+		}else if (sexpr.elements.Count == 5)
+		{
+			//for index value list do
+			var indexName = WalkExpression(sexpr.elements[1], context).AsString();
+			var iterName = WalkExpression(sexpr.elements[2], context).AsString();
+			var range = WalkExpression(sexpr.elements[3], context).AsList().Value;
+			for (var i = 0; i < range.Count; i++)
+			{
+				var ro = range[i];
+				//todo: stacks! for loops operate on entity variables.
+				context.SetProperty(indexName, new LJNumber(i));
+				context.SetProperty(iterName, ro);
+				WalkStatement(sexpr.elements[4], context);
 			}
 		}
 	}
@@ -45,6 +59,12 @@ public class Interpreter
 		{
 			case DeclareExpr declareExpr:
 				//still calling 'root functions' on init, but we ... shouldnt?
+				break;
+			case GroupExpr groupExpr:
+				foreach (var item in groupExpr.elements)
+				{
+					WalkStatement(item, context);
+				}
 				break;
 			case SExpr sexpr:
 				var id = sexpr.Key.Value.ToString();
@@ -87,6 +107,8 @@ public class Interpreter
 				return numberConstant.RuntimeValue;
 			case StringConstant stringConstant:
 				return stringConstant.RuntimeValue;
+			case GroupExpr groupExpr:
+				throw new NotImplementedException("group values constants not supported");
 			case IdentifierConstant identifier:
 				if (context.TryGetProperty(identifier.Value.ToString(), out var value))
 				{

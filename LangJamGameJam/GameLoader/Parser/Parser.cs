@@ -33,6 +33,8 @@ public class Parser
 				return ParseSExpr();
 			case TokenType.OpenDeclare:
 				return ParseDecExpr();
+			case TokenType.OpenGroup:
+				return ParseGroup();
 			case TokenType.Identifier:
 				if (double.TryParse(top.Source, out var val))
 				{
@@ -96,6 +98,18 @@ public class Parser
 
 		Consume(TokenType.CloseDeclare);
 		return new DeclareExpr(id.Source,expressions);
+	}
+
+	private Expr ParseGroup()
+	{
+		List<AST.Expr> expressions = new List<AST.Expr>();
+		while (_tokens.Peek().TokenType != TokenType.CloseGroup)
+		{
+			expressions.Add(ParseExpression());
+		}
+
+		Consume(TokenType.CloseGroup);
+		return new GroupExpr(expressions);
 	}
 
 	private void Consume(TokenType expected)

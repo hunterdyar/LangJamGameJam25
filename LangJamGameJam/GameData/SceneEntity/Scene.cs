@@ -13,7 +13,7 @@ public class Scene : RuntimeBase
 
 	public bool Loaded { get; private set; }
 	public Dictionary<string, ComponentBase> Components;
-	public Scene Parent;
+	public Scene? Parent;
 
 	public void SetLoaded(bool loaded)
 	{
@@ -100,6 +100,13 @@ public class Scene : RuntimeBase
 
 	public override bool TryGetProperty(string id, out RuntimeObject ro)
 	{
+		if (id == "children")
+		{
+			//todo: no reason to keep remaking the list.
+			ro = new LJList(_children.Select(x => (RuntimeObject)new LJSceneReference(x)).ToList());
+			return true;
+		}
+		
 		if (!Properties.TryGetValue(id, out ro))
 		{
 			return _game.TryGetProperty(id, out ro);

@@ -4,11 +4,16 @@ public static class RenderFunctions
 {
 	public static RuntimeObject DrawGridColor(RuntimeBase context, RuntimeObject[] args)
 	{
-		var x = (int)args[0].AsNumber();
-		var y = (int)args[1].AsNumber();
-		var cs = args[2].AsString();
+		var g = ((args[0] as LJComponentReference)?.Value) as NativeComponent;
+		var grid = (NativeComps.Grid)g!;
+		if (grid == null)
+		{
+			throw new Exception("first value of draw-grid-sprite must be a reference to a grid component");
+		}
+		var x = (int)args[1].AsNumber();
+		var y = (int)args[2].AsNumber();
+		var cs = args[3].AsString();
 		var c = Utilities.StringToColor(cs);
-		var grid = context.Scene.GetComponent<NativeComps.Grid>("grid");
 
 		var s = grid.GridInfo.Scale;
 		Raylib_cs.Raylib.DrawRectangle(

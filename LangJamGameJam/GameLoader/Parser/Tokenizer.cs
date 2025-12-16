@@ -94,11 +94,11 @@ public class Tokenizer
 				return true;
 			case '[':
 				pos++;
-				token = new Token(TokenType.OpenList, c);
+				token = new Token(TokenType.OpenGroup, c);
 				return true;
 			case ']':
 				pos++;
-				token = new Token(TokenType.CloseList,c);
+				token = new Token(TokenType.CloseGroup,c);
 				return true;
 			case '(':
 				pos++;
@@ -164,9 +164,9 @@ public class Tokenizer
 	private string ConsumeUntil(char c)
 	{
 		consumeUntilSB.Clear();
-		while (Source[pos] != c)
+		while (Source[pos] != c)//" "
 		{
-			consumeUntilSB.Append(c);
+			consumeUntilSB.Append(Source[pos]);
 			pos++;
 			if (pos >= Length)
 			{

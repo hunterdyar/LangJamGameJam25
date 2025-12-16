@@ -27,6 +27,7 @@ internal static class Program
 			// Raylib.DrawText("Hello, world!", 12, 12, 20, Color.Black);
 			game.Tick();
 
+			//Raylib.DrawFPS(10, 10);
 			Raylib.EndDrawing();
 		}
 

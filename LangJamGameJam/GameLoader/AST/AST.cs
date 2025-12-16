@@ -38,6 +38,13 @@ public class SExpr : Expr
 	}
 }
 
+public class GroupExpr : SExpr
+{
+	public GroupExpr(List<Expr> expressions) : base(expressions)
+	{
+	}
+}
+
 //{}
 public class DeclareExpr : SExpr
 {

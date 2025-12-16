@@ -1,4 +1,5 @@
-﻿using LangJam;
+﻿using System.Runtime.CompilerServices;
+using LangJam;
 
 public static class Builtins
 {
@@ -15,9 +16,17 @@ public static class Builtins
 			{ "get-from", GetFrom},
 			{ "set", Set},
 			{ "set-in", SetIn },
-			{ "invoke", Invoke},
+			{ "invoke", Invoke},//call-down-recursive
 			{ "call", Call },
-			{ "range", Range},
+			{ "call-up", CallUp },
+			{ "broadcast", Broadcast },
+			{ "print", Print },
+			
+			//list
+			{ "range", Range },
+			{ "list", List },
+			{ "count", Count },
+			
 			//input
 			{"register-input-event", RegisterInputEvent},
 			{"unregister-input-event", UnregisterInputEvent },
@@ -42,6 +51,18 @@ public static class Builtins
 			{ "equal", IsEqualTo}
 		};
 
+
+
+	private static RuntimeObject? List(RuntimeBase arg1, RuntimeObject[] args)
+	{
+		return new LJList(args.ToList());
+	}
+
+	private static RuntimeObject? Count(RuntimeBase arg1, RuntimeObject[] args)
+	{
+		var list = args[0].AsList();
+		return new LJNumber(list.Value.Count);
+	}
 	private static RuntimeObject? Range(RuntimeBase context, RuntimeObject[] args)
 	{
 		double fromInc = 0;
@@ -77,6 +98,16 @@ public static class Builtins
 		return null;
 	}
 
+	private static RuntimeObject? Print(RuntimeBase context, RuntimeObject[] args)
+	{
+		foreach (var arg in args)
+		{
+			Console.WriteLine(arg.AsString());
+		}
+
+		return null;
+	}
+
 	private static RuntimeObject? Call(RuntimeBase context, RuntimeObject[] args)
 	{
 		var cont = args[0] as LJRuntimeBaseReference;
@@ -92,6 +123,40 @@ public static class Builtins
 		return null;
 	}
 
+	private static RuntimeObject? CallUp(RuntimeBase callingContext, RuntimeObject[] args)
+	{
+		var contex = callingContext.Scene.Parent;
+		if (contex == null)
+		{
+			throw new Exception($"Unable to call-up. are we in the root scene?");
+		}
+
+		var func = args[0].AsString();
+
+		while (contex != null)
+		{
+			if (contex.Methods.TryGetValue(func, out var e))
+			{
+				contex.Scene.WalkDeclaredExpr(e);
+				break;
+			}
+			else
+			{
+				contex = contex.Parent;
+			}
+		}
+		return null;
+	}
+
+	private static RuntimeObject? Broadcast(RuntimeBase context, RuntimeObject[] args)
+	{
+		var a = args[0].AsString();
+		context.Scene.Game._rootScene.CallMethodRecursive(a);
+		return null;
+	}
+
+
+	
 	private static RuntimeObject? IsEqualTo(RuntimeBase context, RuntimeObject[] args)
 	{
 		var a = args[0];
@@ -137,6 +202,11 @@ public static class Builtins
 
 	public static RuntimeObject? Get(RuntimeBase context, RuntimeObject[] args)
 	{
+		if (args[0] is LJList list)
+		{
+			var index = args[1].AsNumber();
+			return list.Value[(int)index];
+		}
 		var key = args[0].AsString();
 
 		//wait.... i need... hmm. fuck. i need to either have everything be an expression

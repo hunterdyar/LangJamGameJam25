@@ -1,7 +1,7 @@
 ﻿using System.Runtime;
 using LangJam;
 
-public abstract class RuntimeObject
+public abstract class RuntimeObject : IEquatable<RuntimeObject>
 {
 	public abstract double AsNumber();
 	public abstract string AsString();
@@ -10,6 +10,31 @@ public abstract class RuntimeObject
 	public virtual LJList AsList()
 	{
 		throw new Exception("unable to convert object to list/range");
+	}
+
+	public bool Equals(RuntimeObject? other)
+	{
+		throw new NotImplementedException();
+	}
+
+	public override bool Equals(object? obj)
+	{
+		if (obj is null) return false;
+		// if (ReferenceEquals(this, obj)) return true;
+		// if (obj.GetType() != GetType()) return false;
+		return Equals((RuntimeObject)obj);
+	}
+
+	public abstract override int GetHashCode();
+
+	public static bool operator ==(RuntimeObject? left, RuntimeObject? right)
+	{
+		return Equals(left, right);
+	}
+
+	public static bool operator !=(RuntimeObject? left, RuntimeObject? right)
+	{
+		return !Equals(left, right);
 	}
 }
 public abstract class RuntimeObject<T> : RuntimeObject, IEquatable<RuntimeObject<T>>
@@ -173,23 +198,23 @@ public class LJPoint : RuntimeObject<(double X, double Y)>
 	}
 }
 
-public class LJSprite : RuntimeObject<Raylib_cs.RenderTexture2D>
-{
-	public override double AsNumber()
-	{
-		throw new NotImplementedException();
-	}
-
-	public override string AsString()
-	{
-		throw new NotImplementedException();
-	}
-
-	public override bool AsBool()
-	{
-		throw new NotImplementedException();
-	}
-}
+// public class LJSprite : RuntimeObject<Raylib_cs.RenderTexture2D>
+// {
+// 	public override double AsNumber()
+// 	{
+// 		throw new NotImplementedException();
+// 	}
+//
+// 	public override string AsString()
+// 	{
+// 		throw new NotImplementedException();
+// 	}
+//
+// 	public override bool AsBool()
+// 	{
+// 		throw new NotImplementedException();
+// 	}
+// }
 public class LJRuntimeBaseReference : RuntimeObject<RuntimeBase>{
 	public LJRuntimeBaseReference(RuntimeBase rb)
 	{
