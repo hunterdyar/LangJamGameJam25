@@ -6,7 +6,7 @@
 	(set-in grid x-offset 10)
 	(set-in grid y-offset 30)
 	(set-in grid rows 1)
-	(set-in grid cols 3)
+	(set-in grid cols 5)
 	(set-in grid h-align center)
 	(set-in grid v-align middle)
 }

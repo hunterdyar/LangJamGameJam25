@@ -19,7 +19,7 @@
   )
 }
 {on-right
-	(if (lt :x (get-from :g cols))
+	(if (lt :x (dec (get-from :g cols) 1))
 		(set x (inc :x))
 	)
 }
