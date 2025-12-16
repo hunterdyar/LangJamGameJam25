@@ -2,22 +2,28 @@
 
 public class ComponentBase : RuntimeBase
 {
-	protected Entity _entity;
+	protected Scene _myScene;
+	protected string ComponentName { get; set; }
 
-	public ComponentBase(Game game, Scene scene) : base(game, scene)
+	public ComponentBase(string name, Game game, Scene scene) : base(game, scene)
 	{
-		
+		ComponentName = name;
 	}
 
-	public void SetEntity(Entity entity)
+	public virtual string Name()
 	{
-		_entity = entity;
+		return ComponentName;
+	}
+
+	public void SetEntity(Scene entity)
+	{
+		_myScene = entity;
 	}
 	public override bool TryGetProperty(string id, out RuntimeObject expr)
 	{
 		if (!Properties.TryGetValue(id, out expr))
 		{
-			return _entity.TryGetProperty(id, out expr);
+			return _myScene.TryGetProperty(id, out expr);
 		}
 		else
 		{

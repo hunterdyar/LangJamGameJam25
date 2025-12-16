@@ -16,14 +16,13 @@ public class Game : IStackContext
 	private Dictionary<string, ComponentDefinition> _components;
 	
 	private Dictionary<string, RuntimeObject> Globals = new Dictionary<string, RuntimeObject>();
-	public Dictionary<string, EntityDefinition> Prototypes;
 	public Dictionary<string, SceneDefinition> SceneDefinitions => _sceneDefinitions;
 	private Dictionary<string, SceneDefinition> _sceneDefinitions;
 
 	public Dictionary<string, Sprite> Sprites => _sprites;
 	private Dictionary<string, Sprite> _sprites = new Dictionary<string, Sprite>();
 	
-	public Scene _loadedScene;
+	public Scene _rootScene;
 
 	public Game()
 	{
@@ -35,20 +34,15 @@ public class Game : IStackContext
 		_components = components;
 	}
 
-	public void SetEntityDefinitions(Dictionary<string, EntityDefinition> entitiyDefs)
-	{
-		Prototypes = entitiyDefs;
-	}
-
 	public void SetSprites(Dictionary<string, Sprite> sprites)
 	{
 		_sprites = sprites;
 	}
 
-	public Entity SpawnEntity(EntityDefinition definition)
+	public Scene SpawnEntity(SceneDefinition definition)
 	{
-		var e = definition.CreateInstance(this, _loadedScene);
-		_loadedScene.AddEntity(e);
+		var e = definition.CreateInstance(this, _rootScene);
+		_rootScene.AddChild(e);
 		e.CallOnSpawn();
 		return e;
 	}
@@ -60,8 +54,9 @@ public class Game : IStackContext
 
 	public void LoadScene(SceneDefinition sceneDef)
 	{
-		_loadedScene = sceneDef.CreateInstance(this, null!);
-		_loadedScene.RunSceneLogic();
+		_rootScene = sceneDef.CreateInstance(this, null!);
+		_rootScene.RunRootLogic();//todo: eventually will remove this?
+		_rootScene.CallOnSpawn();
 	}
 	
 	public bool TryGetProperty(string id, out RuntimeObject expr)
@@ -73,7 +68,7 @@ public class Game : IStackContext
 	public void Tick()
 	{
 		_inputSystem.Tick();
-		_loadedScene.Tick();
+		_rootScene.Tick();
 	}
 
 	public void SetSceneDefinitions(Dictionary<string, SceneDefinition> sceneDefs)

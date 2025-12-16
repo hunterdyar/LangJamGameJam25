@@ -4,33 +4,42 @@ namespace LangJam;
 
 public class Scene : RuntimeBase
 {
-	public List<Expr> SceneLogic;
-	private List<Entity> _entities;
-	public GridInfo GridInfo
-	{
-		get => _gridInfo;
-		set => _gridInfo = value;
-	}
+	private List<Scene> _children;
+	private SceneDefinition _definition;
+	
+	#region Grid
+	public LJPoint Position => new LJPoint(Properties["x"].AsNumber(), Properties["y"].AsNumber());
+	#endregion
 
-	private GridInfo _gridInfo = new GridInfo();
-	public Scene(Game game) : base(game, null)
+	public bool Loaded { get; private set; }
+	public Dictionary<string, ComponentBase> Components;
+	public Scene Parent;
+
+	public void SetLoaded(bool loaded)
 	{
-		_scene = this;
-		_entities = new List<Entity>();
+		Loaded = loaded;
 	}
-	public void RunSceneLogic()
+	public Scene(SceneDefinition definition, Game game, Scene parent) : base(game, parent)
 	{
-		foreach (var core in SceneLogic)
+		_definition = definition;
+		_scene = this;
+		Parent = parent;
+		_children = new List<Scene>();
+	}
+	
+	public void RunRootLogic()
+	{
+		foreach (var core in _definition.RootExprs)
 		{
 			_game.WalkStatement(core, this);
 		}
 	}
 
-	public void AddEntity(Entity entity)
+	public void AddChild(Scene entity)
 	{
-		if (!_entities.Contains(entity))
+		if (!_children.Contains(entity))
 		{
-			_entities.Add(entity);
+			_children.Add(entity);
 			entity.SetLoaded(true);
 		}
 		else
@@ -39,11 +48,11 @@ public class Scene : RuntimeBase
 		}
 	}
 
-	public void RemoveEntity(Entity entity)
+	public void RemoveEntity(Scene entity)
 	{
-		if (_entities.Contains(entity))
+		if (_children.Contains(entity))
 		{
-			_entities.Remove(entity);
+			_children.Remove(entity);
 		}
 		else
 		{
@@ -53,9 +62,15 @@ public class Scene : RuntimeBase
 
 	public void Tick()
 	{
-		//render the scene.
+		//call self
 		CallRender();
-		foreach (var entity in _entities)
+		foreach (var comp in Components)
+		{
+			comp.Value.CallRender();
+		}
+		
+		//call children
+		foreach (var entity in _children)
 		{
 			entity.CallRender();
 		}
@@ -70,13 +85,45 @@ public class Scene : RuntimeBase
 		return true;
 	}
 
-	#region RuntimeHelpers
-
-	public bool GetEntitiesAt(LJPoint point, out List<Entity> entities)
+	public override string ToString()
 	{
-		entities = _entities.Where(x=> x.Position == point).ToList();
-		return entities.Any();
+		return $"Scene({_definition.EntityDefName})";
 	}
 
-	#endregion
+	//
+	// #region NativeRuntimeHelpers
+	//
+	// public bool GetScenesAt(LJPoint point, out List<Scene> entities)
+	// {
+	// 	entities = _children.Where(x=> x.Position == point).ToList();
+	// 	return entities.Any();
+	// }
+	//
+	// #endregion
+	public T? GetComponent<T>(string compName) where T : ComponentBase
+	{
+		if(Components.TryGetValue(compName, out var componentBase))
+		{
+			return componentBase as T;
+		}
+
+		throw new Exception($"Unable to get component {compName} on {this}");
+
+		return null;
+	}
+
+	public ComponentBase GetComponent(string compName)
+	{
+		if (Components.TryGetValue(compName, out var componentBase))
+		{
+			return componentBase;
+		}
+
+		return null;
+	}
+
+	public bool TryGetComponent(string key, out ComponentBase c)
+	{
+		return Components.TryGetValue(key, out c);
+	}
 }

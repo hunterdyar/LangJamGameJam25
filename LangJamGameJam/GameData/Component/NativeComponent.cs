@@ -1,10 +1,10 @@
 ﻿namespace LangJam;
 
-public class NativeComponent : ComponentBase
+public abstract class NativeComponent : ComponentBase
 {
-	public NativeComponent(Game game, Scene scene) : base(game, scene)
+	public NativeComponent(string name, Game game, Scene scene) : base(name, game, scene)
 	{
-		
+		//this is so fucken hacky i hate it...
 	}
 
 	public override void CallRender()
@@ -13,4 +13,5 @@ public class NativeComponent : ComponentBase
 	}
 	
 	//list of declared functions, except we call our override special functions
+
 }

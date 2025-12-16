@@ -27,8 +27,7 @@ public class Interpreter
 		switch (expr)
 		{
 			case DeclareExpr declareExpr:
-			//add it to the relevant 
-			throw new NotImplementedException();
+				//still calling 'root functions' on init, but we ... shouldnt?
 				break;
 			case SExpr sexpr:
 				var id = sexpr.Key.Value.ToString();

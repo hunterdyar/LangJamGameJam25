@@ -3,6 +3,7 @@
 public enum HAlignment { Left, Center, Right }
 public enum VAlignment { Top, Middle, Bottom }
 
+//todo: move all this to inside of nativecomp Grid class.
 public class GridInfo
 {
 	public int Scale = 100;

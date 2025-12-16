@@ -48,8 +48,7 @@ public static class GameLoader
 
 		Game game = new Game();
 		game.SetComponentDefinitions(LoadComponents(componentsFiles));
-		game.SetSceneDefinitions(LoadScenes(sceneFiles));
-		game.SetEntityDefinitions(LoadEntities(entityFiles));
+		game.SetSceneDefinitions(LoadSceneDefinitions(sceneFiles));
 		game.SetSprites(LoadSprites(spriteFiles));
 		if (game.SceneDefinitions.TryGetValue("main", out var mainScene))
 		{
@@ -57,8 +56,7 @@ public static class GameLoader
 		}
 		else
 		{
-			Console.WriteLine("No main scene found. Loading empty scene.");
-			game.LoadScene(new SceneDefinition(new List<Expr>()));
+			throw new Exception("no main scene set. There must be a scene called 'main'");
 		}
 		//find the main scene.
 		//top-level folders are organizing.
@@ -94,9 +92,9 @@ public static class GameLoader
 		return sprites;
 	}
 
-	private static Dictionary<string, EntityDefinition> LoadEntities(List<FileInfo> entityFiles)
+	private static Dictionary<string, SceneDefinition> LoadSceneDefinitions(List<FileInfo> entityFiles)
 	{
-		Dictionary<string, EntityDefinition> entityDefs = new Dictionary<string, EntityDefinition>();
+		Dictionary<string, SceneDefinition> entityDefs = new Dictionary<string, SceneDefinition>();
 		foreach (var fileInfo in entityFiles)
 		{
 			var contents = fileInfo.OpenText().ReadToEnd();
@@ -105,7 +103,7 @@ public static class GameLoader
 			var eName = Path.GetFileNameWithoutExtension(fileInfo.Name).ToLower();
 			
 			//todo: comp list is special?
-			var comps = p.RootExpressions.Cast<SExpr>().Where(x => x.Key != null && x.Key.Value == "components");
+			var comps = p.RootExpressions.Cast<SExpr>().Where(x => x.Key != null && x.Key.Value == "components").ToArray();
 			List<string> compNames = new List<string>();
 			if (comps.Any())
 			{
@@ -122,26 +120,16 @@ public static class GameLoader
 					}
 				}
 			}
-			
-			entityDefs.Add(eName, new EntityDefinition(eName, p.RootExpressions, compNames));
+
+			//components are special, so remove this list!
+			foreach (var compExpr in comps)
+			{
+				p.RootExpressions.Remove(compExpr);
+			}
+			entityDefs.Add(eName, new SceneDefinition(eName, p.RootExpressions, compNames));
 		}
 
 		return entityDefs;
-	}
-
-	private static Dictionary<string, SceneDefinition> LoadScenes(List<FileInfo> sceneFiles)
-	{
-		Dictionary<string, SceneDefinition> comps = new Dictionary<string, SceneDefinition>();
-		foreach (var fileInfo in sceneFiles)
-		{
-			var contents = fileInfo.OpenText().ReadToEnd();
-			var p = new Parser.Parser();
-			p.Parse(fileInfo.Name, contents);
-			var compName = Path.GetFileNameWithoutExtension(fileInfo.Name).ToLower();
-			comps.Add(compName, new SceneDefinition(p.RootExpressions));
-		}
-
-		return comps;
 	}
 
 	private static Dictionary<string, ComponentDefinition> LoadComponents(List<FileInfo> componentsFiles)
@@ -153,7 +141,7 @@ public static class GameLoader
 			var p = new Parser.Parser();
 			p.Parse(fileInfo.Name, contents);
 			var compName = Path.GetFileNameWithoutExtension(fileInfo.Name).ToLower();
-			comps.Add(compName, new ComponentDefinition(p.RootExpressions));
+			comps.Add(compName, new ComponentDefinition(compName, p.RootExpressions));
 		}
 
 		return comps;

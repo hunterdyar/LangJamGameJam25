@@ -6,9 +6,10 @@ public class Component : ComponentBase
 {
 	private List<Expr> _exprs;
 
-	public Component(List<Expr> exprs, Game game, Scene scene) : base(game, scene)
+	public Component(List<Expr> exprs, string name, Game game, Scene scene) : base(name, game, scene)
 	{
 		_exprs = exprs;
 		RegisterEventFunctions(_exprs);
 	}
+
 }

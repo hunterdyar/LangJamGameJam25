@@ -1,1 +1,0 @@
-{render (draw-grid-color 0 0 blue)}

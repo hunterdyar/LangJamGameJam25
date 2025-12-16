@@ -1,21 +1,65 @@
-﻿using LangJam.Loader.AST;
+﻿using HelloWorld;
+using LangJam.Loader.AST;
 
 namespace LangJam;
 
-public class SceneDefinition : DefinitionBase<Scene>
+public class SceneDefinition 
 {
-	public SceneDefinition(List<Expr> exprs) : base(exprs)
+	public string EntityDefName => _defName;
+	private string _defName;
+	private bool compListDirty = true;
+	private List<ComponentDefinition> RealizedCompList;
+	public bool HasRenderFunction = false;
+	private List<string> CompList;
+	public List<Expr> RootExprs => _rootExprs;
+	private List<Expr> _rootExprs;
+
+	public SceneDefinition(string entityName, List<Expr> pRootExpressions, List<string> compList)
 	{
+		_rootExprs = pRootExpressions;
+		this._defName = entityName;
+		CompList = compList;
 	}
 
-	/// <summary>
-	/// Scene override gets ignored for now BUT this is how we would do a parent relationship, i think?
-	/// </summary>
-	public override Scene CreateInstance(Game game, Scene scene)
+	public Scene CreateInstance(Game game, Scene parent)
 	{
-		return new Scene(game)
+		//lazy init.
+		if (compListDirty)
 		{
-			SceneLogic = RootExprs,//todo: this can be to the def.
+			RealizedCompList = new List<ComponentDefinition>();
+			foreach (string component in CompList)
+			{
+				if (game.Components.TryGetValue(component, out var c))
+				{
+					RealizedCompList.Add(c);
+				}else if (NativeComponents.TryGetNativeComponent(component, game, parent, out var nc))
+				{
+					RealizedCompList.Add(new ComponentDefinition(component, new List<Expr>(), true));
+				}
+				else
+				{
+					throw new Exception($"error on entity {_defName}, unknown component {component}");
+				}
+			}
+
+			compListDirty = false;
+		}
+
+		var comps = new Dictionary<string, ComponentBase>();
+		var e = new Scene(this, game, parent)
+		{
+			Components = comps,
 		};
+		foreach (var definition in RealizedCompList)
+		{
+			var c = definition.CreateInstance(game, e);
+			comps.Add(c.Name(),c);
+		}
+
+		e.Components = comps;
+		e.RegisterEventFunctions(this.RootExprs);
+
+		return e;
 	}
+	
 }

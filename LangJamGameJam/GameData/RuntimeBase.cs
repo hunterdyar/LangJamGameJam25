@@ -128,4 +128,12 @@ public abstract class RuntimeBase : IStackContext
 			_game.WalkStatement(exprs[i],this);
 		}
 	}
+
+	public virtual void SetProperty(string key, RuntimeObject val)
+	{
+		if (!Properties.TryAdd(key, val))
+		{
+			Properties[key] = val;
+		}
+	}
 }

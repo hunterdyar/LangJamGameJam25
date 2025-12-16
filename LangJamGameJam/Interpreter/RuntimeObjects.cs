@@ -1,4 +1,5 @@
-﻿using LangJam;
+﻿using System.Runtime;
+using LangJam;
 
 public abstract class RuntimeObject
 {
@@ -10,7 +11,7 @@ public abstract class RuntimeObject<T> : RuntimeObject, IEquatable<RuntimeObject
 {
 	public T Value => _value;
 	protected T _value;
-
+	
 	public virtual void SetValue(T val)
 	{
 		_value = val;
@@ -184,9 +185,29 @@ public class LJSprite : RuntimeObject<Raylib_cs.RenderTexture2D>
 		throw new NotImplementedException();
 	}
 }
-public class LJEntityReference : RuntimeObject<Entity>
+public class LJRuntimeBaseReference : RuntimeObject<RuntimeBase>{
+	public LJRuntimeBaseReference(RuntimeBase rb)
+	{
+		_value = rb;
+	}
+	public override double AsNumber()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override string AsString()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override bool AsBool()
+	{
+		throw new NotImplementedException();
+	}
+}
+public class LJSceneReference : RuntimeObject<Scene>
 {
-	public LJEntityReference(Entity entity)
+	public LJSceneReference(Scene entity)
 	{
 		_value = entity;
 	}
@@ -204,6 +225,15 @@ public class LJEntityReference : RuntimeObject<Entity>
 	public override bool AsBool()
 	{
 		throw new NotImplementedException();
+	}
+}
+
+public class LJComponentReference : LJRuntimeBaseReference
+{
+	private ComponentBase _componentBase;
+	public LJComponentReference(ComponentBase componentBase) : base(componentBase)
+	{
+		_value = componentBase;
 	}
 }
 
