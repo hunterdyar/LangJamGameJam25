@@ -1,11 +1,12 @@
 ﻿using HelloWorld;
+using HelloWorld.Interpreter;
 using LangJam;
 using LangJam.Loader.AST;
 
 public class Interpreter
 {
 	//control-flow if
-	private void CFIf(SExpr sexpr, RuntimeBase context)
+	private void CFIf(SExpr sexpr, RuntimeBase context, Routine? routineContext = null)
 	{
 		//id ("if") is 0
 		var compare = WalkExpression(sexpr.elements[1], context);
@@ -22,7 +23,7 @@ public class Interpreter
 		}
 	}
 
-	private void CFFor(SExpr sexpr, RuntimeBase context)
+	private void CFFor(SExpr sexpr, RuntimeBase context, Routine? routineContext)
 	{
 		//id ("for") is 0
 		//for index list do
@@ -30,12 +31,12 @@ public class Interpreter
 		if (sexpr.elements.Count == 4)
 		{
 			var range = WalkExpression(sexpr.elements[2], frame).AsList().Value;
-			var iterName = WalkExpression(sexpr.elements[1], frame).AsString();
+			var iterName = WalkExpression(sexpr.elements[1], frame, routineContext).AsString();
 			foreach (var ro in range)
 			{
 				//todo: stacks! for loops operate on entity variables.
 				frame.SetProperty(iterName, ro);
-				WalkStatement(sexpr.elements[3], frame);
+				WalkStatement(sexpr.elements[3], frame, routineContext);
 			}
 		}else if (sexpr.elements.Count == 5)
 		{
@@ -54,8 +55,16 @@ public class Interpreter
 		}
 	}
 
-	public void WalkStatement(Expr expr, RuntimeBase context)
+	public void WalkStatement(Expr expr, RuntimeBase context, Routine? routineContext = null)
 	{
+		if (routineContext != null)
+		{
+			if (routineContext.ShouldNotTick())
+			{
+				return;
+			}
+		}
+		
 		switch (expr)
 		{
 			case DeclareExpr declareExpr:
@@ -72,10 +81,40 @@ public class Interpreter
 				switch (id)
 				{
 					case "if":
-						CFIf(sexpr, context);
-						return;
+						CFIf(sexpr, context, routineContext);
+						return ;
 					case "for":
-						CFFor(sexpr, context);
+						CFFor(sexpr, context, routineContext);
+						return ;
+					case "while":
+						CFFor(sexpr, context, routineContext);
+						return;
+					case "start-routine":
+						CFRoutine(sexpr, context, routineContext);
+						return ;
+					case "yield":
+						if (routineContext == null)
+						{
+							throw new Exception("Cannot yield while outside a routine.");
+						}
+						//pardon me for my sins. yields must only have one instruction... and they cannot be references? shit!
+						var ryiSexpr = sexpr.elements[1] as SExpr;
+						if (RoutineFunctions.Yields.TryGetValue(ryiSexpr.Key.Value, out var y))
+						{
+							var args = new RuntimeObject[ryiSexpr.elements.Count - 1];
+							for (int i = 1; i < ryiSexpr.elements.Count; i++)
+							{
+								var ro = WalkExpression(ryiSexpr.elements[i], context);
+								args[i - 1] = ro;
+							}
+
+							var yi = y?.Invoke(context, args);
+							routineContext.SetCurrent(yi);
+						}
+						else
+						{
+							throw new Exception($"Unknown yield to '{id} for {context}");
+						}
 						return;
 				}
 				if (Builtins.BuiltinFunctions.TryGetValue(id, out var call))
@@ -95,12 +134,24 @@ public class Interpreter
 				//check if there are constants...
 				break;
 			break;
-			
 		}
+
+		return ;
+	}
+
+	private void CFRoutine(SExpr sexpr, RuntimeBase context, Routine? routineContext = null)
+	{
+		if (routineContext != null)
+		{
+			throw new Exception(
+				"i don't think you should be able to start a routine inside a routine. I'm not sure and haven't tested it, but it feels off");
+		}
+		var routine = new Routine(sexpr, context);
+		context.Game.RoutineSystem.StartRoutine(routine);
 	}
 
 	//we anticipate a value to be spit out here... but all expressions are values...
-	private RuntimeObject WalkExpression(Expr expr, RuntimeBase context)
+	private RuntimeObject WalkExpression(Expr expr, RuntimeBase context, Routine? routineContext = null)
 	{
 		switch (expr)
 		{

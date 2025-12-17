@@ -29,5 +29,8 @@
 	)
 }
 {move-swap
- (if (gt :facing 0) (set facing -1) (set facing 1))
+	(start-routine 
+		(yield (wait 1))
+		(if (gt :facing 0) (set facing -1) (set facing 1))
+	)
 }

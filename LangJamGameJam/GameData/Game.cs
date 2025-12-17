@@ -1,4 +1,5 @@
-﻿using LangJam.Loader.AST;
+﻿using HelloWorld.Interpreter;
+using LangJam.Loader.AST;
 using Microsoft.VisualBasic;
 
 namespace LangJam;
@@ -9,6 +10,9 @@ public class Game : IStackContext
 	public InputSystem InputSystem => _inputSystem;
 	private InputSystem _inputSystem;
 	private Interpreter _interpreter;
+
+	public RoutineSystem RoutineSystem => _routineSystem;
+	private RoutineSystem _routineSystem;
 	//list of sprite data
 	//list of level data
 	//list of entities
@@ -28,6 +32,7 @@ public class Game : IStackContext
 	{
 		_interpreter = new Interpreter();
 		_inputSystem = new InputSystem();
+		_routineSystem = new RoutineSystem();
 	}
 	public void SetComponentDefinitions(Dictionary<string, ComponentDefinition> components)
 	{
@@ -55,9 +60,9 @@ public class Game : IStackContext
 		return e;
 	}
 
-	public void WalkStatement(Expr expr, RuntimeBase context)
+	public void WalkStatement(Expr expr, RuntimeBase context, Routine? routine = null)
 	{
-		_interpreter.WalkStatement(expr, context);
+		_interpreter.WalkStatement(expr, context, routine);
 	}
 
 	public void LoadScene(SceneDefinition sceneDef)
@@ -76,6 +81,7 @@ public class Game : IStackContext
 	public void Tick()
 	{
 		_inputSystem.Tick();
+		_routineSystem.TickRoutines();
 		_rootScene.Tick();
 	}
 
