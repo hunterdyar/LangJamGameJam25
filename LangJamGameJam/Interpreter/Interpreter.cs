@@ -109,7 +109,7 @@ public class Interpreter
 							}
 
 							var yi = y?.Invoke(context, args);
-							routineContext.SetCurrent(yi);
+							routineContext.AddYieldInstructionAtCurrent(yi);
 						}
 						else
 						{
@@ -141,12 +141,12 @@ public class Interpreter
 
 	private void CFRoutine(SExpr sexpr, RuntimeBase context, Routine? routineContext = null)
 	{
+		var routine = new Routine(sexpr, context);
 		if (routineContext != null)
 		{
-			throw new Exception(
-				"i don't think you should be able to start a routine inside a routine. I'm not sure and haven't tested it, but it feels off");
+			routineContext.AddYieldInstructionAtCurrent(new YieldForRoutine(routine));
+			Console.WriteLine("i hope this works");
 		}
-		var routine = new Routine(sexpr, context);
 		context.Game.RoutineSystem.StartRoutine(routine);
 	}
 

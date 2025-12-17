@@ -2,8 +2,6 @@
 using LangJam;
 using LangJam.Loader.AST;
 
-namespace HelloWorld.Interpreter;
-
 public class Routine
 {
 	private SExpr _block;
@@ -43,13 +41,23 @@ public class Routine
 			}
 			while (_instructions.Count > 0)
 			{
-				var yi = _instructions.Dequeue();
+				var yi = _instructions.Peek();
+				yi.Tick();
 				if (yi.KeepWaiting())
 				{
 					yield return yi;
 				}
+				else
+				{
+					_instructions.Dequeue();
+				}
 			}
 		}
+	}
+
+	public void StartSubroutine(Routine routine)
+	{
+		AddYieldInstructionAtCurrent(new YieldForRoutine(routine));
 	}
 
 	public void Tick()
@@ -67,7 +75,7 @@ public class Routine
 		}
 	}
 
-	public void SetCurrent(YieldInstruction? yi)
+	public void AddYieldInstructionAtCurrent(YieldInstruction? yi)
 	{
 		if (yi != null)
 		{

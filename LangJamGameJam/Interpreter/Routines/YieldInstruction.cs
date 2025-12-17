@@ -10,6 +10,10 @@ public abstract class YieldInstruction : IEnumerator
 		return KeepWaiting();
 	}
 
+	public virtual void Tick()
+	{
+		
+	}
 	public virtual void Reset()
 	{
 		
