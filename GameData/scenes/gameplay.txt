@@ -1,6 +1,6 @@
 (components grid)
 
-{on-spawn 
+{on-spawn
 	(set player (spawn player))
 	(set-in grid scale 100)
 	(set-in grid x-offset 0)
@@ -12,7 +12,7 @@
 }
 
 {render
-	(for i (range 0 5)
+	(for @i (range 0 5)
 		(draw-grid-circle :grid :i 0 0.5 grey)
 	)
 }

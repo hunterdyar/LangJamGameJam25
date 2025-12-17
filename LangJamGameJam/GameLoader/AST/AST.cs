@@ -156,6 +156,22 @@ public class KeyExpr : Expr
 	}
 }
 
+public class SymbolExpr : Expr
+{
+	private string _value;
+	public string Value => _value;
+
+	public SymbolExpr(string val)
+	{
+		_value = val;
+	}
+	
+	public override string ToString()
+	{
+		return _value;
+	}
+}
+
 public class StringConstant : Expr
 {
 	public string Value;

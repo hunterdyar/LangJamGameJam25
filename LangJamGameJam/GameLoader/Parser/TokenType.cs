@@ -14,5 +14,6 @@ public enum TokenType
 	String,
 	Identifier,
 	Key,
+	Symbol,
 	EOF,
 }

@@ -26,29 +26,30 @@ public class Interpreter
 	{
 		//id ("for") is 0
 		//for index list do
+		var frame = new FrameContext(context);
 		if (sexpr.elements.Count == 4)
 		{
-			var range = WalkExpression(sexpr.elements[2], context).AsList().Value;
-			var iterName = WalkExpression(sexpr.elements[1], context).AsString();
+			var range = WalkExpression(sexpr.elements[2], frame).AsList().Value;
+			var iterName = WalkExpression(sexpr.elements[1], frame).AsString();
 			foreach (var ro in range)
 			{
 				//todo: stacks! for loops operate on entity variables.
-				context.SetProperty(iterName, ro);
-				WalkStatement(sexpr.elements[3], context);
+				frame.SetProperty(iterName, ro);
+				WalkStatement(sexpr.elements[3], frame);
 			}
 		}else if (sexpr.elements.Count == 5)
 		{
 			//for index value list do
-			var indexName = WalkExpression(sexpr.elements[1], context).AsString();
-			var iterName = WalkExpression(sexpr.elements[2], context).AsString();
-			var range = WalkExpression(sexpr.elements[3], context).AsList().Value;
+			var indexName = WalkExpression(sexpr.elements[1], frame).AsString();
+			var iterName = WalkExpression(sexpr.elements[2], frame).AsString();
+			var range = WalkExpression(sexpr.elements[3], frame).AsList().Value;
 			for (var i = 0; i < range.Count; i++)
 			{
 				var ro = range[i];
 				//todo: stacks! for loops operate on entity variables.
-				context.SetProperty(indexName, new LJNumber(i));
-				context.SetProperty(iterName, ro);
-				WalkStatement(sexpr.elements[4], context);
+				frame.SetProperty(indexName, new LJNumber(i));
+				frame.SetProperty(iterName, ro);
+				WalkStatement(sexpr.elements[4], frame);
 			}
 		}
 	}
@@ -107,6 +108,8 @@ public class Interpreter
 				return numberConstant.RuntimeValue;
 			case StringConstant stringConstant:
 				return stringConstant.RuntimeValue;
+			case SymbolExpr symbolConstant:
+				return new LJString(symbolConstant.Value);//todo: make an LJSymbol runtime type.
 			case GroupExpr groupExpr:
 				throw new NotImplementedException("group values constants not supported");
 			case IdentifierConstant identifier:

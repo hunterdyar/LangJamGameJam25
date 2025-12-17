@@ -47,6 +47,8 @@ public class Parser
 					return new NumberConstant(n);
 				}
 				return new KeyExpr(top.Source);
+			case TokenType.Symbol:
+				return new SymbolExpr(top.Source);
 			case TokenType.String:
 				return new StringConstant(top.Source);
 			case TokenType.Point:
@@ -57,7 +59,6 @@ public class Parser
 				return ParseBool();
 			case TokenType.EOF:
 				throw new Exception($"Unexpected end of file in {_context}.");
-			
 		}
 
 		throw new Exception($"Unexpected token {top} in {_context}");
@@ -91,6 +92,13 @@ public class Parser
 	{
 		List<AST.Expr> expressions = new List<AST.Expr>();
 		var id = _tokens.Dequeue();
+		var args = new List<SymbolExpr>();
+		while (_tokens.Peek().TokenType == TokenType.Symbol)
+		{
+			var s = _tokens.Dequeue();
+			var symbol =  new SymbolExpr(s.Source); 
+			args.Add(symbol);
+		}
 		while (_tokens.Peek().TokenType != TokenType.CloseDeclare)
 		{
 			expressions.Add(ParseExpression());

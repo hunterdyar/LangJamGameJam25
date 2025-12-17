@@ -116,6 +116,11 @@ public class Tokenizer
 				pos++;
 				token = new Token(TokenType.CloseDeclare, c);
 				return true;
+			case '@':
+				pos++;
+				var symbol = ConsumeValue();
+				token = new Token(TokenType.Symbol, symbol);
+				return true;
 			case '"':
 				pos++;//consume opening "
 				var data = ConsumeUntil('"');
