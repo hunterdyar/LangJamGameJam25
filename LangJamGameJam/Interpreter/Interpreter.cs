@@ -127,6 +127,7 @@ public class Interpreter
 				//number is non-zero
 				//identifiers are true/false/error
 				//string is type-error.
+				return new LJBool(o.AsBool());
 				break;
 			case KeyExpr keyExpr:
 				return new LJKey(keyExpr.Value);
