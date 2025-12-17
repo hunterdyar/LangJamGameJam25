@@ -2,11 +2,18 @@
 {on-spawn
 	(set x 0)
 	(set y 0)
+	(set facing 1)
 	(set g (find-comp-in-parent grid))
 }
 
 {render
-	(draw-grid-sprite :g (get x) (get y) slime)
+	(if (eq :facing 1)
+		(draw-grid-sprite :g (get x) (get y) slimeright)
+	)
+	(if (eq :facing -1)
+		(draw-grid-sprite :g (get x) (get y) slimeleft)
+	)
+
 }
 
 {move-left
@@ -18,4 +25,7 @@
 	(if (lt :x (dec (get-from :g cols) 1))
 		(set x (inc :x))
 	)
+}
+{move-swap
+ (if (gt :facing 0) (set facing -1) (set facing 1))
 }
