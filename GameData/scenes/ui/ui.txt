@@ -8,6 +8,7 @@
 	(set-in grid cols 3)
 	(set-in grid h-align center)
 	(set-in grid v-align middle)
+	(set card-h (list "move-left-h" "move-swap-h" "move-right-h"))
 	(set card (list "move-left" "move-swap" "move-right"))
 	(set highlighted-card 1)
 }
@@ -16,8 +17,8 @@
 	(for i j :card
 		[
 		(if (eq :i :highlighted-card) 
-			(draw-grid-circle :grid :i 0 0.5 red)
-			(draw-grid-circle :grid :i 0 0.5 grey)
+			(draw-grid-sprite :grid :i 0 (get :card-h :i))
+			(draw-grid-sprite :grid :i 0 :j)
 		)
 #		(get :card :i)
 		]

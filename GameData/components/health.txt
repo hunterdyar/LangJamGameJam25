@@ -1,0 +1,3 @@
+(on-spawn
+	(set points 4)
+)

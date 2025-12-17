@@ -9,9 +9,11 @@
 {render
 	(if (eq :facing 1)
 		(draw-grid-sprite :g (get x) (get y) slimeright)
-	)
-	(if (eq :facing -1)
-		(draw-grid-sprite :g (get x) (get y) slimeleft)
+		
+		#i don't have "else if". but i do have an else. here's an if.
+		(if (eq :facing -1)
+			(draw-grid-sprite :g (get x) (get y) slimeleft)
+		)
 	)
 
 }
