@@ -123,6 +123,11 @@ public class LJKey : LJString
 {
 	public LJKey(string val) : base(val)
 	{ }
+
+	public override string ToString()
+	{
+		return $"Key({Value}";
+	}
 }
 
 public class LJSymbol : LJString
@@ -134,6 +139,11 @@ public class LJSymbol : LJString
 	public override string AsSymbol()
 	{
 		return Value;
+	}
+
+	public override string ToString()
+	{
+		return $"Symbol({Value})";
 	}
 }
 public class LJNumber : RuntimeObject<double>
@@ -157,6 +167,11 @@ public class LJNumber : RuntimeObject<double>
 	{
 		return _value == 0;
 	}
+
+	public override string ToString()
+	{
+		return $"Num({Value})";
+	}
 }
 
 public class LJBool: RuntimeObject<bool>
@@ -178,6 +193,11 @@ public class LJBool: RuntimeObject<bool>
 	public override bool AsBool()
 	{
 		return _value;
+	}
+
+	public override string ToString()
+	{
+		return $"Bool({Value})";
 	}
 }
 

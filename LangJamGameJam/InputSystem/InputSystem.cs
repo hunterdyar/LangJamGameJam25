@@ -144,7 +144,7 @@ public class InputSystem
 			{
 				foreach (var context in value)
 				{
-					context.Item1.Game.Interpreter.WalkDeclaredExpr(context.Item2, context.Item1, context.Item3);
+					 context.Item1.Game.Interpreter.WalkDeclaredExpr(context.Item2, context.Item1, context.Item3);
 				}
 			}
 			c = Raylib.GetKeyPressed();

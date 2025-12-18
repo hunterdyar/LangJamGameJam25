@@ -196,6 +196,7 @@ public class Interpreter
 						for (int i = 1; i < sexpr.Elements.Length; i++)
 						{
 							var ro = WalkExpression(sexpr.Elements[i], context);
+							
 							args[i - 1] = ro;
 						}
 
@@ -233,6 +234,11 @@ public class Interpreter
 		if (args.Length != expr.Arguments.Length)
 		{
 			throw new Exception($"wrong number of arguments for function {expr.Identifier} in {context}");
+		}
+
+		if (args.Length > 0)
+		{
+			throw new NotImplementedException();
 		}
 		for (int i = 0; i < expr.Elements.Length; i++)
 		{

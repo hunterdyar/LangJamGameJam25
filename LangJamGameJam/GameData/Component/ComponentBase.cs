@@ -55,7 +55,9 @@ public class ComponentBase : RuntimeBase
 	{
 		if (!Methods.TryGetValue(id, out expr))
 		{
-			return _myScene.TryGetMethod(id, out expr);
+			return false;
+			//todo: when the component calls methods, it should bubble up. When the component calls on it's children, it should not bubble up.
+			// return _myScene.TryGetMethod(id, out expr);
 		}
 		else
 		{
