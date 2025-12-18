@@ -43,8 +43,20 @@ public static class Builtins
 			{ "mul", MathFunctions.BinOp((a, b) => a * b) },
 			{ "div", MathFunctions.BinOp((a, b) => a / b) },
 			{ "mod", MathFunctions.BinOp((a, b) => a % b) },
-			{ "pow", MathFunctions.BinOp((a, b) => Math.Pow(a,b)) },
+			{ "pow", MathFunctions.BinOp(Math.Pow) },
+			{ "sin", MathFunctions.UnOp(Math.Sin) },
+			{ "cos", MathFunctions.UnOp(Math.Cos) },
+			{ "tan", MathFunctions.UnOp(Math.Tan) },
+			{ "floor", MathFunctions.UnOp(Math.Floor) },
+			{ "ceil", MathFunctions.UnOp(Math.Ceiling) },
+			{ "round", MathFunctions.UnOp(Math.Round) },
+			{ "ease-in", MathFunctions.UnOp(MathFunctions.EaseInExpo)},
+			{ "ease-out", MathFunctions.UnOp(MathFunctions.EaseOutExpo) },
+			{ "ease-in-out", MathFunctions.UnOp(MathFunctions.EaseInOutExpo) },
+
+			//easings
 			
+
 			//compare
 			{ "gt", MathFunctions.BinComp(((a , b) => a>b))},
 			{ "greater-than", MathFunctions.BinComp(((a , b) => a>b))},
