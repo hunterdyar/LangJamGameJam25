@@ -1,4 +1,5 @@
-﻿using HelloWorld.Interpreter;
+﻿using System.Collections;
+using HelloWorld.Interpreter;
 using LangJam.Loader.AST;
 using Microsoft.VisualBasic;
 
@@ -9,6 +10,7 @@ public class Game : IStackContext
 	//interpreter things
 	public InputSystem InputSystem => _inputSystem;
 	private InputSystem _inputSystem;
+	public Interpreter Interpreter => _interpreter;
 	private Interpreter _interpreter;
 
 	public RoutineSystem RoutineSystem => _routineSystem;
@@ -24,6 +26,7 @@ public class Game : IStackContext
 	private Dictionary<string, SceneDefinition> _sceneDefinitions;
 
 	public Dictionary<string, Sprite> Sprites => _sprites;
+
 	private Dictionary<string, Sprite> _sprites = new Dictionary<string, Sprite>();
 	
 	public Scene _rootScene;
@@ -60,9 +63,24 @@ public class Game : IStackContext
 		return e;
 	}
 
-	public void WalkStatement(Expr expr, RuntimeBase context, Routine? routine = null)
+	public IEnumerator<YieldInstruction?> WalkStatement(Expr expr, RuntimeBase context)
 	{
-		_interpreter.WalkStatement(expr, context, routine);
+		var n = _interpreter.WalkStatement(expr, context);
+		while (n != null)
+		{
+			if (!n.MoveNext())
+			{
+				break;
+			}
+			if (n.Current.KeepWaiting())
+			{
+				throw new Exception("Should not yield in root game. yields should be inside routines");
+			}
+			//we do not wait for yields in the root
+			continue;
+		}
+
+		return null;
 	}
 
 	public void LoadScene(SceneDefinition sceneDef)
@@ -89,9 +107,15 @@ public class Game : IStackContext
 	{
 		_sceneDefinitions = sceneDefs;
 	}
+
+	public void SetProperty(string id, RuntimeObject val, bool createIfDoesntExist)
+	{
+		throw new Exception("globals not supported");
+	}
 }
 
 public interface IStackContext
 {
 	public bool TryGetProperty(string id, out RuntimeObject runtimeObject);
+	public void SetProperty(string id, RuntimeObject val, bool createIfDoesntExist);
 }

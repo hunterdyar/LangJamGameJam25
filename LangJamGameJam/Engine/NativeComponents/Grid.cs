@@ -1,4 +1,5 @@
 ﻿using LangJam;
+using LangJam.Loader.AST;
 
 namespace NativeComps;
 public class Grid : NativeComponent
@@ -39,37 +40,83 @@ public class Grid : NativeComponent
 		}
 	}
 
-	public override void SetProperty(string key, RuntimeObject val)
+	public override bool TryExecuteMethod(string id, List<RuntimeObject> toList)
+	{
+		switch (id)
+		{
+			case "get-scene-at":
+				throw new Exception("shit, return types are fucked if we do it this way");
+		}
+		return base.TryExecuteMethod(id, toList);
+	}
+
+	public override bool TryGetMethod(string id, out DeclareExpr expr)
+	{
+		switch (id)
+		{
+			case "get-scene-at":
+				// todo: replace returning the tree with "call method"
+				
+				break;
+		}
+			
+		return base.TryGetMethod(id, out expr);
+	}
+
+	public override void SetProperty(string key, RuntimeObject val, bool forceCreate)
 	{
 		switch (key)
 		{
 			case "scale":
 				GridInfo.Scale = (int)val.AsNumber();
-				break;
+				return;
 			case "y-offset":
 				GridInfo.SetYOffset(val.AsNumber());
-				break;
+				return;
 			case "x-offset":
 				GridInfo.SetXOffset(val.AsNumber());
-				break;
+				return;
 			case "rows":
 				GridInfo.Rows = (int)val.AsNumber();
-				break;
+				return;
 			case "cols":
 				GridInfo.Cols = (int)val.AsNumber();
-				break;
+				return;
 			case "horizontal-align":
 			case "h-align":
 				GridInfo.SetHorizontalAlignment(val.AsString());
-				break;
+				return;
 			case "vertical-align":
 			case "v-align":
 				GridInfo.SetVerticalAlignment(val.AsString());
-				break;
+				return;
 			default:
 				throw new Exception($"Unable to get grid data {key}.");
 		}
 
-		base.SetProperty(key, val);
+		base.SetProperty(key, val, forceCreate);
+	}
+
+	public LJBool HasSceneAt(LJPoint point)
+	{
+		return HasSceneAt(point.X, point.Y);
+	}
+
+	private LJBool HasSceneAt(LJNumber x, LJNumber y)
+	{
+		var any = Scene.Children.Any(s => s.Position.X.Value == x.Value && s.Position.Y.Value == y.Value);
+		return new LJBool(any);
+	}
+
+	private LJSceneReference GetFirstSceneAt(LJNumber x, LJNumber y)
+	{
+		var f = Scene.Children.Find(s => s.Position.X.Value == x.Value && s.Position.Y.Value == y.Value);
+		if (f == null)
+		{
+			//null scene references? do we have nulls? no? well uh
+			throw new Exception($"cannot get child scene at grid position {x}/{y}");
+		}
+
+		return new LJSceneReference(f);
 	}
 }

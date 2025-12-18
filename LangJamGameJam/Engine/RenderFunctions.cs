@@ -34,8 +34,8 @@ public static class RenderFunctions
 		{
 			throw new Exception("first value of draw-grid-sprite must be a reference to a grid component");
 		}
-		var x = (int)args[1].AsNumber();
-		var y = (int)args[2].AsNumber();
+		var x = args[1].AsNumber();
+		var y = args[2].AsNumber();
 		var snamne = args[3].AsString();
 		
 
@@ -45,8 +45,8 @@ public static class RenderFunctions
 		}
 
 		var s = grid.GridInfo.Scale;
-		var dx = grid.GridInfo.XOffset + x * s;
-		var dy = grid.GridInfo.YOffset + y * s;
+		var dx = (int)(grid.GridInfo.XOffset + (x * s));
+		var dy = (int)(grid.GridInfo.YOffset + (y * s));
 		sprite.Draw(dx,dy, s);
 		return null;
 	}

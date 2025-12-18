@@ -14,11 +14,6 @@ public class ComponentBase : RuntimeBase
 	{
 		return ComponentName;
 	}
-
-	public void SetEntity(Scene entity)
-	{
-		_myScene = entity;
-	}
 	public override bool TryGetProperty(string id, out RuntimeObject expr)
 	{
 		if (!Properties.TryGetValue(id, out expr))
@@ -30,5 +25,26 @@ public class ComponentBase : RuntimeBase
 			return false;
 		}
 	}
-	
+
+	public override void SetProperty(string key, RuntimeObject val, bool createIfDoesntExist)
+	{
+		if (createIfDoesntExist)
+		{
+			if (!Properties.TryAdd(key, val))
+			{
+				Properties[key] = val;
+			}
+		}
+		else
+		{
+			if (Properties.ContainsKey(key))
+			{
+				Properties[key] = val;
+			}
+			else
+			{
+				Scene.SetProperty(key, val, createIfDoesntExist);
+			}
+		}
+	}
 }

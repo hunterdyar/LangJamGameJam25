@@ -7,7 +7,7 @@ public abstract class RuntimeBase : IStackContext
 {
 	public Dictionary<string, RuntimeObject> Properties = new Dictionary<string, RuntimeObject>();
 	//todo:ExpressionBody Type
-	public Dictionary<string, DeclareExpr> Methods = new Dictionary<string, DeclareExpr>();
+	protected Dictionary<string, DeclareExpr> Methods = new Dictionary<string, DeclareExpr>();
 	
 	public Expr[]? RenderCall;
 	public Expr[]? OnSpawn;
@@ -62,10 +62,25 @@ public abstract class RuntimeBase : IStackContext
 		}
 	}
 
+	public virtual bool TryExecuteMethod(string id, List<RuntimeObject> toList)
+	{
+		if (TryGetMethod(id, out var method))
+		{
+			WalkDeclaredExpr(method);//args
+			return true;
+		}
+
+		return false;
+	}
 
 	public virtual bool TryGetProperty(string id, out RuntimeObject expr)
 	{
 		return Properties.TryGetValue(id, out expr);
+	}
+
+	public virtual bool TryGetMethod(string id, out DeclareExpr expr)
+	{
+		return Methods.TryGetValue(id, out expr);
 	}
 	
 	//todo: after we do {definitions}, these event functions can be different. although probably still want render cached without the lookup.
@@ -118,22 +133,48 @@ public abstract class RuntimeBase : IStackContext
 	{
 		for (int i = 0; i < expr.elements.Length; i++)
 		{
-			_game.WalkStatement(expr.elements[i], this);
+			var n = _game.WalkStatement(expr.elements[i], this);
+			while (n != null && n.MoveNext())
+			{
+				//we do not wait for yields in the root
+				continue;
+			}
+
 		}
 	}
 	private void WalkExpressionArray(Expr[] exprs)
 	{
 		for (int i = 0; i < exprs.Length; i++)
 		{
-			_game.WalkStatement(exprs[i],this);
+			var n = _game.WalkStatement(exprs[i],this);
+			while (n != null && n.MoveNext())
+			{
+				//we do not wait for yields in the root
+				continue;
+			}
 		}
 	}
 
-	public virtual void SetProperty(string key, RuntimeObject val)
+	public virtual void SetProperty(string key, RuntimeObject val, bool createIfDoesntExist)
 	{
-		if (!Properties.TryAdd(key, val))
+		if (createIfDoesntExist)
 		{
-			Properties[key] = val;
+			if (!Properties.TryAdd(key, val))
+			{
+				Properties[key] = val;
+			}
+		}
+		else
+		{
+			if (Properties.ContainsKey(key))
+			{
+				Properties[key] = val;
+			}
+			else
+			{
+				//must not be ours, fail upwards!
+				Scene.SetProperty(key, val, createIfDoesntExist);
+			}
 		}
 	}
 }

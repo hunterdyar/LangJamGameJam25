@@ -25,5 +25,16 @@ public static class MathFunctions
 			return new LJBool(result);
 		});
 	}
+
+	public static Func<RuntimeBase, RuntimeObject[], RuntimeObject?> BinOp(Func<double, double, double> op)
+	{
+		return new Func<RuntimeBase, RuntimeObject[], RuntimeObject?>((context, args) =>
+		{
+			var left = args[0].AsNumber();
+			var right = args[1].AsNumber();
+			var result = op.Invoke(left, right);
+			return new LJNumber(result);
+		});
+	}
 	
 }

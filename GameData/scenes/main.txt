@@ -1,6 +1,6 @@
 {on-spawn
-	(set gameplay (spawn gameplay))
-	(set ui (spawn ui))
+	(set @gameplay (spawn gameplay))
+	(set @ui (spawn ui))
 	(register-input-event handle-on-left left press)
 	(register-input-event handle-on-left a press)
 	(register-input-event handle-on-right right press)

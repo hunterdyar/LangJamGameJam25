@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using LangJam;
+using LangJam.Loader.AST;
 
 public static class Builtins
 {
@@ -37,6 +38,12 @@ public static class Builtins
 			//math
 			{ "inc", MathFunctions.Increment},
 			{ "dec", MathFunctions.Decrement},
+			{ "add", MathFunctions.BinOp((a,b)  => a+b)},
+			{ "sub", MathFunctions.BinOp((a, b) => a - b) },
+			{ "mul", MathFunctions.BinOp((a, b) => a * b) },
+			{ "div", MathFunctions.BinOp((a, b) => a / b) },
+			{ "mod", MathFunctions.BinOp((a, b) => a % b) },
+			{ "pow", MathFunctions.BinOp((a, b) => Math.Pow(a,b)) },
 			
 			//compare
 			{ "gt", MathFunctions.BinComp(((a , b) => a>b))},
@@ -116,10 +123,7 @@ public static class Builtins
 			throw new Exception($"Unable to call on {args[0]}. expected scene or component reference");
 		}
 		var func = args[1].AsString();
-		if(cont.Value.Scene.Methods.TryGetValue(func, out var e))
-		{
-			cont.Value.Scene.WalkDeclaredExpr(e);	
-		}
+		cont.Value.Scene.TryExecuteMethod(func, args.Skip(2).ToList());
 		return null;
 	}
 
@@ -135,9 +139,9 @@ public static class Builtins
 
 		while (contex != null)
 		{
-			if (contex.Methods.TryGetValue(func, out var e))
+			
+			if (contex.TryExecuteMethod(func, args.Skip(1).ToList()))
 			{
-				contex.Scene.WalkDeclaredExpr(e);
 				break;
 			}
 			else
@@ -167,8 +171,10 @@ public static class Builtins
 	public static RuntimeObject? Set(RuntimeBase context, RuntimeObject[] args)
 	{
 		var key = args[0].AsString();
+		var create = args[0] is LJSymbol;
 		var val = args[1];
-		context.SetProperty(key, val);
+		
+		context.SetProperty(key, val, create);
 		return val;
 	}
 
@@ -177,10 +183,10 @@ public static class Builtins
 		RuntimeBase realTarget;
 
 		var target = args[0];
-		if (target is LJKey)
+		if (target is LJKey)//set-in component
 		{
 			realTarget = context.Scene.GetComponent(target.AsString());
-		}else if (target is LJRuntimeBaseReference ljref)
+		}else if (target is LJRuntimeBaseReference ljref)//set-in scene
 		{
 			realTarget = ljref.Value;
 		}
@@ -188,15 +194,19 @@ public static class Builtins
 		{
 			throw new Exception($"Cannot set-in {context}. needs component key (name) or entity/component reference");
 		}
-		
-		
+
+		bool create = false;
+		if (args[1] is LJSymbol)
+		{
+			create = true;
+		}
 		var key = args[1].AsString();
 		var val = args[2];
 
 		//wait.... i need... hmm. fuck. i need to either have everything be an expression
 		//or i need to be smarter about both the event system and the property system.
 		//which involves thinking. taking a break...
-		realTarget.SetProperty(key,val);
+		realTarget.SetProperty(key,val, create);//check if item is a symbol.
 		return val;
 	}
 
@@ -237,7 +247,7 @@ public static class Builtins
 			throw new Exception($"Cannot get-from {context}. needs component key (name) or entity/component reference");
 		}
 		var key = args[1].AsString();
-		if (realTarget.Properties.TryGetValue(key, out var val))
+		if (realTarget.TryGetProperty(key, out var val))
 		{
 			return val;
 		}
@@ -258,6 +268,7 @@ public static class Builtins
 
 			p = p.Parent;
 		}
+		
 		if (context.Properties.TryGetValue(key, out var val))
 		{
 			return val;
@@ -295,13 +306,13 @@ public static class Builtins
 		var keyState = args[2].AsString();
 		
 		//funcName to decExpr
-		if (context.Methods.TryGetValue(funcName, out var declareExpr))
+		if (context.TryGetMethod(funcName, out var declareExpr))
 		{
 			context.Game.InputSystem.RegisterInputEvent(context, declareExpr, keyName, keyState);
 		}
 		else
 		{
-			throw new Exception($"Unable to register input event, unknown method {funcName} on {context}");
+			throw new Exception($"Unable to register input event, unknown method {funcName} on {context}. Hint: Registering input methods does not work on NativeComponent methods. wrap in a '(call)' to bypass.");
 		}
 
 		return null;
@@ -314,7 +325,7 @@ public static class Builtins
 		var keyState = args[2].AsString();
 
 		//funcName to decExpr
-		if (context.Methods.TryGetValue(funcName, out var declareExpr))
+		if (context.TryGetMethod(funcName, out var declareExpr))
 		{
 			context.Game.InputSystem.UnregisterInputEvent(context, declareExpr, keyName, keyState);
 		}

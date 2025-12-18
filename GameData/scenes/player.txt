@@ -1,9 +1,9 @@
-
+(components moves)
 {on-spawn
-	(set x 0)
-	(set y 0)
-	(set facing 1)
-	(set g (find-comp-in-parent grid))
+	(set @x 0)
+	(set @y 0)
+	(set @facing 1)
+	(set @g (find-comp-in-parent grid))
 }
 
 {render
@@ -14,23 +14,5 @@
 		(if (eq :facing -1)
 			(draw-grid-sprite :g (get x) (get y) slimeleft)
 		)
-	)
-
-}
-
-{move-left
- (if (gt :x 0)
-	(set x (dec :x))
-  )
-}
-{move-right
-	(if (lt :x (dec (get-from :g cols) 1))
-		(set x (inc :x))
-	)
-}
-{move-swap
-	(start-routine 
-		(yield (wait 1))
-		(if (gt :facing 0) (set facing -1) (set facing 1))
 	)
 }

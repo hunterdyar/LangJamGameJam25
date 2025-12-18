@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+﻿using System.Linq.Expressions;
+using System.Runtime;
 using LangJam;
 using LangJam.Loader.AST;
 
@@ -10,7 +11,6 @@ public class Routine
 	public bool Complete => _complete;
 	private bool _complete = false;
 
-	private Queue<YieldInstruction> _instructions = new Queue<YieldInstruction>();
 	public Routine(SExpr routineBlock, RuntimeBase context)
 	{
 		_block = routineBlock;
@@ -18,68 +18,39 @@ public class Routine
 		_routineBlock = RoutineBlock();
 	}
 
-	public bool ShouldNotTick()
+	private IEnumerator<YieldInstruction?> RoutineBlock()
 	{
-		if(_instructions.TryPeek(out var result))
-		{
-			return result.KeepWaiting();
-		}
-		return false;
-	}
-
-	private IEnumerator<YieldInstruction> RoutineBlock()
-	{
-		//1; skip 'routine'
+		//1; skip 'start-routine'
 		for (var i = 1; i < _block.elements.Count; i++)
 		{
-			_context.Game.WalkStatement(_block.elements[i], _context, this);
-			//during the walk, _instructions will get enqueued with any yields in this area.
-			if (_instructions.Count > 1)
+			var n = _context.Game.Interpreter.WalkStatement(_block.elements[i], _context);
+			if (n == null)
 			{
-				throw new Exception(
-					"we've stacked yields, they're nested in some way. this should be allowed but isn't because the routine system is a fragile mess");
+				continue;
 			}
-			while (_instructions.Count > 0)
+			while (n != null && n.MoveNext())
 			{
-				var yi = _instructions.Peek();
-				yi.Tick();
-				if (yi.KeepWaiting())
+				while (n.Current.KeepWaiting())
 				{
-					yield return yi;
-				}
-				else
-				{
-					_instructions.Dequeue();
+					n.Current.Tick();
+					yield return n.Current;
 				}
 			}
 		}
 	}
+	
 
-	public void StartSubroutine(Routine routine)
+	public IEnumerator<YieldInstruction?> Tick()
 	{
-		AddYieldInstructionAtCurrent(new YieldForRoutine(routine));
-	}
+		_routineBlock.MoveNext();
+		while (_routineBlock.Current == null || !_routineBlock.Current.KeepWaiting())
+		{
+			if (!_routineBlock.MoveNext())
+			{
+				break;
+			}
+		}
 
-	public void Tick()
-	{
-		if (_routineBlock.Current == null)
-		{
-			_routineBlock.MoveNext();
-		}else if (_routineBlock.Current.KeepWaiting())
-		{
-			return;
-		}
-		else
-		{
-			_routineBlock.MoveNext();
-		}
-	}
-
-	public void AddYieldInstructionAtCurrent(YieldInstruction? yi)
-	{
-		if (yi != null)
-		{
-			_instructions.Enqueue(yi);
-		}
+		return null;
 	}
 }

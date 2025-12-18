@@ -8,13 +8,13 @@
 	(set-in grid cols 3)
 	(set-in grid h-align center)
 	(set-in grid v-align middle)
-	(set card-h (list "move-left-h" "move-swap-h" "move-right-h"))
-	(set card (list "move-left" "move-swap" "move-right"))
-	(set highlighted-card 1)
+	(set @card-h (list "move-left-h" "move-swap-h" "move-right-h"))
+	(set @card (list "move-left" "move-swap" "move-right"))
+	(set @highlighted-card 1)
 }
 
 {render
-	(for i j :card
+	(for @i @j :card
 		[
 		(if (eq :i :highlighted-card) 
 			(draw-grid-sprite :grid :i 0 (get :card-h :i))

@@ -6,24 +6,34 @@ using LangJam.Loader.AST;
 public class Interpreter
 {
 	//control-flow if
-	private void CFIf(SExpr sexpr, RuntimeBase context, Routine? routineContext = null)
+	private IEnumerator<YieldInstruction> CFIf(SExpr sexpr, RuntimeBase context)
 	{
 		//id ("if") is 0
 		var compare = WalkExpression(sexpr.elements[1], context);
 		if (compare.AsBool())
 		{
-			WalkStatement(sexpr.elements[2], context);
+			var n = WalkStatement(sexpr.elements[2], context);
+			while (n != null && n.MoveNext())
+			{
+				continue;
+			}
 		}
 		else
 		{
 			if (sexpr.elements.Count == 4)//if,comp,cons,alt
 			{
-				WalkStatement(sexpr.elements[3], context);
+				var n = WalkStatement(sexpr.elements[3], context);
+				while (n!=null && n.MoveNext())
+				{
+					continue;
+				}
 			}
 		}
+
+		return null;
 	}
 
-	private void CFFor(SExpr sexpr, RuntimeBase context, Routine? routineContext)
+	private IEnumerator<YieldInstruction?> CFFor(SExpr sexpr, RuntimeBase context)
 	{
 		//id ("for") is 0
 		//for index list do
@@ -31,40 +41,41 @@ public class Interpreter
 		if (sexpr.elements.Count == 4)
 		{
 			var range = WalkExpression(sexpr.elements[2], frame).AsList().Value;
-			var iterName = WalkExpression(sexpr.elements[1], frame, routineContext).AsString();
+			var iterName = WalkExpression(sexpr.elements[1], frame).AsSymbol();
 			foreach (var ro in range)
 			{
 				//todo: stacks! for loops operate on entity variables.
-				frame.SetProperty(iterName, ro);
-				WalkStatement(sexpr.elements[3], frame, routineContext);
+				frame.SetProperty(iterName, ro, true);
+				var n = WalkStatement(sexpr.elements[3], frame);
+				while (n != null && n.MoveNext())
+				{
+					yield return n.Current;
+				}
 			}
 		}else if (sexpr.elements.Count == 5)
 		{
 			//for index value list do
-			var indexName = WalkExpression(sexpr.elements[1], frame).AsString();
-			var iterName = WalkExpression(sexpr.elements[2], frame).AsString();
+			var indexName = WalkExpression(sexpr.elements[1], frame).AsSymbol();
+			var iterName = WalkExpression(sexpr.elements[2], frame).AsSymbol();
 			var range = WalkExpression(sexpr.elements[3], frame).AsList().Value;
 			for (var i = 0; i < range.Count; i++)
 			{
 				var ro = range[i];
 				//todo: stacks! for loops operate on entity variables.
-				frame.SetProperty(indexName, new LJNumber(i));
-				frame.SetProperty(iterName, ro);
-				WalkStatement(sexpr.elements[4], frame);
+				frame.SetProperty(indexName, new LJNumber(i), true);
+				frame.SetProperty(iterName, ro, true);
+				var n = WalkStatement(sexpr.elements[4], frame);
+				while (n != null && n.MoveNext())
+				{
+					continue;
+				}
 			}
 		}
 	}
 
-	public void WalkStatement(Expr expr, RuntimeBase context, Routine? routineContext = null)
+	public IEnumerator<YieldInstruction?> WalkStatement(Expr expr, RuntimeBase context)
 	{
-		if (routineContext != null)
-		{
-			if (routineContext.ShouldNotTick())
-			{
-				return;
-			}
-		}
-		
+		IEnumerator<YieldInstruction?> n;
 		switch (expr)
 		{
 			case DeclareExpr declareExpr:
@@ -73,81 +84,106 @@ public class Interpreter
 			case GroupExpr groupExpr:
 				foreach (var item in groupExpr.elements)
 				{
-					WalkStatement(item, context);
+					n = WalkStatement(item, context);
+					while (n!= null && n.MoveNext())
+					{
+						yield return n.Current;
+					}
 				}
 				break;
 			case SExpr sexpr:
 				var id = sexpr.Key.Value.ToString();
+				bool handledBySwitch = true;
 				switch (id)
 				{
 					case "if":
-						CFIf(sexpr, context, routineContext);
-						return ;
-					case "for":
-						CFFor(sexpr, context, routineContext);
-						return ;
-					case "while":
-						CFFor(sexpr, context, routineContext);
-						return;
-					case "start-routine":
-						CFRoutine(sexpr, context, routineContext);
-						return ;
-					case "yield":
-						if (routineContext == null)
+						n = CFIf(sexpr, context);
+						while (n != null && n.MoveNext())
 						{
-							throw new Exception("Cannot yield while outside a routine.");
+							yield return n.Current;
 						}
+						break;
+					case "for":
+						n = CFFor(sexpr, context);
+						while (n != null && n.MoveNext())
+						{
+							yield return n.Current;
+						}
+						break;
+					case "while":
+						// return CF(sexpr, context);
+						throw new NotImplementedException();
+					case "start-routine":
+						n = CFRoutine(sexpr, context);
+						while (n != null && n.MoveNext())
+						{
+							yield return n.Current;
+						}
+						break;
+					case "yield":
 						//pardon me for my sins. yields must only have one instruction... and they cannot be references? shit!
 						var ryiSexpr = sexpr.elements[1] as SExpr;
 						if (RoutineFunctions.Yields.TryGetValue(ryiSexpr.Key.Value, out var y))
 						{
+							//a call to 'yield' that returns the yieldinstruction
 							var args = new RuntimeObject[ryiSexpr.elements.Count - 1];
 							for (int i = 1; i < ryiSexpr.elements.Count; i++)
 							{
 								var ro = WalkExpression(ryiSexpr.elements[i], context);
 								args[i - 1] = ro;
 							}
-
+							//create the actual YieldInstruction
 							var yi = y?.Invoke(context, args);
-							routineContext.AddYieldInstructionAtCurrent(yi);
+							yield return yi;
 						}
 						else
 						{
 							throw new Exception($"Unknown yield to '{id} for {context}");
 						}
-						return;
+						break;
+					default:
+						handledBySwitch = false;
+						break;
 				}
-				if (Builtins.BuiltinFunctions.TryGetValue(id, out var call))
+
+				if (!handledBySwitch)
 				{
-					var args = new RuntimeObject[sexpr.elements.Count-1];
-					for (int i = 1; i < sexpr.elements.Count; i++)
+					if (Builtins.BuiltinFunctions.TryGetValue(id, out var call))
 					{
-						var ro = WalkExpression(sexpr.elements[i], context);
-						args[i-1] = ro;
+						var args = new RuntimeObject[sexpr.elements.Count - 1];
+						for (int i = 1; i < sexpr.elements.Count; i++)
+						{
+							var ro = WalkExpression(sexpr.elements[i], context);
+							args[i - 1] = ro;
+						}
+
+						call?.Invoke(context, args);
 					}
-					call?.Invoke(context, args);
+					else
+					{
+						throw new Exception($"Unknown call to '{id} for {context}");
+					}
+					//check if there are constants...
 				}
-				else
-				{
-					throw new Exception($"Unknown call to '{id} for {context}");
-				}
-				//check if there are constants...
+
 				break;
 			break;
 		}
-
-		return ;
 	}
 
-	private void CFRoutine(SExpr sexpr, RuntimeBase context, Routine? routineContext = null)
+	private IEnumerator<YieldInstruction> CFRoutine(SExpr sexpr, RuntimeBase context, Routine? routineContext = null)
 	{
 		var routine = new Routine(sexpr, context);
 		if (routineContext != null)
 		{
-			routineContext.AddYieldInstructionAtCurrent(new YieldForRoutine(routine));
+			yield return new YieldForRoutine(routine);
 			Console.WriteLine("i hope this works");
 		}
-		context.Game.RoutineSystem.StartRoutine(routine);
+		var n = context.Game.RoutineSystem.StartRoutine(routine);
+		while (n != null && n.MoveNext())
+		{
+			continue;
+		}
 	}
 
 	//we anticipate a value to be spit out here... but all expressions are values...
@@ -160,7 +196,7 @@ public class Interpreter
 			case StringConstant stringConstant:
 				return stringConstant.RuntimeValue;
 			case SymbolExpr symbolConstant:
-				return new LJString(symbolConstant.Value);//todo: make an LJSymbol runtime type.
+				return new LJSymbol(symbolConstant.Value);
 			case GroupExpr groupExpr:
 				throw new NotImplementedException("group values constants not supported");
 			case IdentifierConstant identifier:

@@ -36,6 +36,11 @@ public abstract class RuntimeObject : IEquatable<RuntimeObject>
 	{
 		return !Equals(left, right);
 	}
+
+	public virtual string AsSymbol()
+	{
+		throw new NotImplementedException("Unable to convert to symbol. Do you need an @?");
+	}
 }
 public abstract class RuntimeObject<T> : RuntimeObject, IEquatable<RuntimeObject<T>>
 {
@@ -118,6 +123,18 @@ public class LJKey : LJString
 {
 	public LJKey(string val) : base(val)
 	{ }
+}
+
+public class LJSymbol : LJString
+{
+	public LJSymbol(string val) : base(val)
+	{
+	}
+
+	public override string AsSymbol()
+	{
+		return Value;
+	}
 }
 public class LJNumber : RuntimeObject<double>
 {

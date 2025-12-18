@@ -4,6 +4,7 @@ namespace LangJam;
 
 public class Scene : RuntimeBase
 {
+	public List<Scene> Children => _children;
 	private List<Scene> _children;
 	private SceneDefinition _definition;
 	
@@ -12,6 +13,7 @@ public class Scene : RuntimeBase
 	#endregion
 
 	public bool Loaded { get; private set; }
+
 	public Dictionary<string, ComponentBase> Components;
 	public Scene? Parent;
 
@@ -31,7 +33,12 @@ public class Scene : RuntimeBase
 	{
 		foreach (var core in _definition.RootExprs)
 		{
-			_game.WalkStatement(core, this);
+			var r = _game.WalkStatement(core, this);
+			while (r != null  && r.MoveNext())
+			{
+				//we do not wait for yields in the root logic.
+				continue;
+			}
 		}
 	}
 
@@ -86,7 +93,7 @@ public class Scene : RuntimeBase
 
 		foreach (var kvp in Components)
 		{
-			if(kvp.Value.Methods.TryGetValue(methodName, out var cexpr))
+			if(kvp.Value.TryGetMethod(methodName, out var cexpr))
 			{
 				WalkDeclaredExpr(cexpr);
 			}
@@ -153,5 +160,35 @@ public class Scene : RuntimeBase
 	public bool TryGetComponent(string key, out ComponentBase c)
 	{
 		return Components.TryGetValue(key, out c);
+	}
+
+	public override void SetProperty(string key, RuntimeObject val, bool createIfDoesntExist)
+	{
+		if (createIfDoesntExist)
+		{
+			if (!Properties.TryAdd(key, val))
+			{
+				Properties[key] = val;
+			}
+		}
+		else
+		{
+			if (Properties.ContainsKey(key))
+			{
+				Properties[key] = val;
+			}
+			else
+			{
+				if (Parent != null)
+				{
+					Parent.SetProperty(key, val, createIfDoesntExist);
+				}
+				else
+				{
+					throw new Exception(
+						$"Unable to set property {key} on {this}. To crate a new variable, use the @symbol. e.g. (set @{key} {val})");
+				}
+			}
+		}
 	}
 }

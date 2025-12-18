@@ -13,10 +13,10 @@ public class RoutineSystem
 
 	private List<Routine> _markForDelete = new List<Routine>();
 
-	public void StartRoutine(Routine routine)
+	public IEnumerator<YieldInstruction?> StartRoutine(Routine routine)
 	{
 		_list.Add(routine);
-		routine.Tick();
+		return routine.Tick();//tick up to the first yield i guess?
 	}
 	public void TickRoutines()
 	{
