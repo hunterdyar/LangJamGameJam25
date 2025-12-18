@@ -13,5 +13,8 @@ public abstract class NativeComponent : ComponentBase
 	}
 	
 	//list of declared functions, except we call our override special functions
-
+	public override string ToString()
+	{
+		return $"NativeComponent({Name()})";
+	}
 }

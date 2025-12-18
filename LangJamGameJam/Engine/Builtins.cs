@@ -123,7 +123,7 @@ public static class Builtins
 			throw new Exception($"Unable to call on {args[0]}. expected scene or component reference");
 		}
 		var func = args[1].AsString();
-		cont.Value.Scene.TryExecuteMethod(func, args.Skip(2).ToList());
+		cont.Value.Scene.TryExecuteMethod(func, args.Skip(2).ToArray());
 		return null;
 	}
 
@@ -139,8 +139,7 @@ public static class Builtins
 
 		while (contex != null)
 		{
-			
-			if (contex.TryExecuteMethod(func, args.Skip(1).ToList()))
+			if (contex.TryExecuteMethod(func, args.Skip(1).ToArray()))
 			{
 				break;
 			}
@@ -304,11 +303,12 @@ public static class Builtins
 		var funcName = args[0].AsString();
 		var keyName = args[1].AsString();
 		var keyState = args[2].AsString();
+		var callArgs = args.Skip(3).ToArray();
 		
 		//funcName to decExpr
 		if (context.TryGetMethod(funcName, out var declareExpr))
 		{
-			context.Game.InputSystem.RegisterInputEvent(context, declareExpr, keyName, keyState);
+			context.Game.InputSystem.RegisterInputEvent(context, declareExpr, keyName, keyState, callArgs);
 		}
 		else
 		{

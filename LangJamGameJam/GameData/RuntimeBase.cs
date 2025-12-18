@@ -39,19 +39,19 @@ public abstract class RuntimeBase : IStackContext
 				switch (id)
 				{
 					case "render":
-						RenderCall = decExpr.elements;
+						RenderCall = decExpr.Elements;
 						Methods.Add(id, decExpr);
 						break;
 					case "on-spawn":
-						OnSpawn = decExpr.elements;
+						OnSpawn = decExpr.Elements;
 						Methods.Add(id, decExpr);
 						break;
 					case "on-enable":
-						OnEnable = decExpr.elements;
+						OnEnable = decExpr.Elements;
 						Methods.Add(id, decExpr);
 						break;
 					case "on-disable":
-						OnDisable = decExpr.elements;
+						OnDisable = decExpr.Elements;
 						Methods.Add(id, decExpr);
 						break;
 					default:
@@ -62,11 +62,11 @@ public abstract class RuntimeBase : IStackContext
 		}
 	}
 
-	public virtual bool TryExecuteMethod(string id, List<RuntimeObject> toList)
+	public virtual bool TryExecuteMethod(string id, RuntimeObject[] args)
 	{
 		if (TryGetMethod(id, out var method))
 		{
-			WalkDeclaredExpr(method);//args
+			_game.Interpreter.WalkDeclaredExpr(method,this, args);//args
 			return true;
 		}
 
@@ -96,7 +96,7 @@ public abstract class RuntimeBase : IStackContext
 		}
 	}
 
-	public void CallOnSpawn()
+	public virtual void CallOnSpawn()
 	{
 		if (!Enabled)
 		{
@@ -128,20 +128,7 @@ public abstract class RuntimeBase : IStackContext
 			WalkExpressionArray(OnDisable);
 		}
 	}
-
-	public void WalkDeclaredExpr(DeclareExpr expr)
-	{
-		for (int i = 0; i < expr.elements.Length; i++)
-		{
-			var n = _game.WalkStatement(expr.elements[i], this);
-			while (n != null && n.MoveNext())
-			{
-				//we do not wait for yields in the root
-				continue;
-			}
-
-		}
-	}
+	
 	private void WalkExpressionArray(Expr[] exprs)
 	{
 		for (int i = 0; i < exprs.Length; i++)

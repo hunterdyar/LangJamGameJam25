@@ -40,7 +40,7 @@ public class Grid : NativeComponent
 		}
 	}
 
-	public override bool TryExecuteMethod(string id, List<RuntimeObject> toList)
+	public override bool TryExecuteMethod(string id, RuntimeObject[] toList)
 	{
 		switch (id)
 		{
@@ -90,8 +90,6 @@ public class Grid : NativeComponent
 			case "v-align":
 				GridInfo.SetVerticalAlignment(val.AsString());
 				return;
-			default:
-				throw new Exception($"Unable to get grid data {key}.");
 		}
 
 		base.SetProperty(key, val, forceCreate);

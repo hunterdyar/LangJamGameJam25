@@ -1,23 +1,25 @@
 {on-spawn
-	(set @taking-turn 0)#bool constants?
+	#bool constants?
+	(set @taking-turn 0)
 }
+
 
 {move-left
  (if :taking-turn (print "fuck"))
  (if (gt :x 0)
 	(start-routine
-			(set @rx :x)#base x
-			(for @t (range 0 (get-from :g scale))
-			[
-				(print :t)
-				(set x (sub :rx (div :t (get-from :g scale))))
-				(yield (seconds (div .5  (get-from :g scale))))
-			]
-			)
-			(set @x (sub :rx 1))
+		(set @rx :x)#base x
+		(for @t (range 0 (get-from :g scale))
+		[
+			(set x (sub :rx (div :t (get-from :g scale))))
+			(yield (seconds (div .5  (get-from :g scale))))
+		]
 		)
+		(set @x (sub :rx 1))
+	)
   )
 }
+
 {move-right
 	(if (lt :x (dec (get-from :g cols) 1))
 		(start-routine

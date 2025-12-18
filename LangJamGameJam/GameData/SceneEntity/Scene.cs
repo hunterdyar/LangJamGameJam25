@@ -56,6 +56,15 @@ public class Scene : RuntimeBase
 		}
 	}
 
+	public override void CallOnSpawn()
+	{
+		base.CallOnSpawn();
+		foreach (var component in Components)
+		{
+			component.Value.CallOnSpawn();
+		}
+	}
+
 	public void RemoveEntity(Scene entity)
 	{
 		if (_children.Contains(entity))
@@ -88,14 +97,14 @@ public class Scene : RuntimeBase
 	{
 		if (Methods.TryGetValue(methodName, out var expr))
 		{
-			WalkDeclaredExpr(expr);
+			_game.Interpreter.WalkDeclaredExpr(expr,this, []);
 		}
 
 		foreach (var kvp in Components)
 		{
 			if(kvp.Value.TryGetMethod(methodName, out var cexpr))
 			{
-				WalkDeclaredExpr(cexpr);
+				_game.Interpreter.WalkDeclaredExpr(cexpr,kvp.Value, []);
 			}
 		}
 

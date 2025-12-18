@@ -105,7 +105,7 @@ public class Parser
 		}
 
 		Consume(TokenType.CloseDeclare);
-		return new DeclareExpr(id.Source,expressions);
+		return new DeclareExpr(id.Source,args,expressions);
 	}
 
 	private Expr ParseGroup()

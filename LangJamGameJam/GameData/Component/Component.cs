@@ -12,4 +12,8 @@ public class Component : ComponentBase
 		RegisterEventFunctions(_exprs);
 	}
 
+	public override string ToString()
+	{
+		return $"Component({Name()})";
+	}
 }

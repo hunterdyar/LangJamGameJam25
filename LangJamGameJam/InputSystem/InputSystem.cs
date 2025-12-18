@@ -53,25 +53,26 @@ public struct LJInputEvent : IEquatable<LJInputEvent>
 
 public class InputSystem
 {
-	public Dictionary<LJInputEvent, List<(RuntimeBase, DeclareExpr)>> Registered = new Dictionary<LJInputEvent, List<(RuntimeBase, DeclareExpr)>>();
+	public Dictionary<LJInputEvent, List<(RuntimeBase, DeclareExpr, RuntimeObject[])>> Registered = new Dictionary<LJInputEvent, List<(RuntimeBase, DeclareExpr, RuntimeObject[])>>();
 	
 	public void OnSystemEvent()
 	{
 		//find the appropriate event and uh, you know. send it.
 	}
 
-	public void RegisterInputEvent(RuntimeBase element, DeclareExpr tocall, string keyname, string keystate)
+	//todo: pass along arguments
+	public void RegisterInputEvent(RuntimeBase element, DeclareExpr tocall, string keyname, string keystate, RuntimeObject[] args)
 	{
 		var key = StringToKeycode(keyname);
 		var state = StringToState(keystate);
 		var ljievent = new LJInputEvent(key, state);
 		if (Registered.ContainsKey(ljievent))
 		{
-			Registered[ljievent].Add((element, tocall));
+			Registered[ljievent].Add((element, tocall,args));
 		}
 		else
 		{
-			Registered.Add(ljievent, [(element,tocall)]);
+			Registered.Add(ljievent, [(element,tocall,args)]);
 		}
 	}
 
@@ -82,7 +83,7 @@ public class InputSystem
 		var ljievent = new LJInputEvent(key, state);
 		if (Registered.ContainsKey(ljievent))
 		{
-			Registered[ljievent].Remove((element,tocall));
+			Registered[ljievent].Remove((element,tocall, []));
 		}
 		else
 		{
@@ -143,12 +144,11 @@ public class InputSystem
 			{
 				foreach (var context in value)
 				{
-					context.Item1.WalkDeclaredExpr(context.Item2);
+					context.Item1.Game.Interpreter.WalkDeclaredExpr(context.Item2, context.Item1, context.Item3);
 				}
 			}
 			c = Raylib.GetKeyPressed();
 		}
-		
 	}
 }
 

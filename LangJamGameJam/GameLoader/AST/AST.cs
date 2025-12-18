@@ -11,23 +11,23 @@ public class Expr
 public class SExpr : Expr
 {
 	public KeyExpr? Key;
-	public List<Expr> elements = new List<Expr>();
+	public Expr[] Elements;
 
 	public SExpr(List<Expr> expressions)
 	{
-		elements = expressions;
-		Key = elements.Count > 0 ? elements[0] as KeyExpr : null;
+		Elements = expressions.ToArray();
+		Key = Elements.Length > 0 ? Elements[0] as KeyExpr : null;
 	}
 
 	public override string ToString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.Append('(');
-		for (var i = 0; i < elements.Count; i++)
+		for (var i = 0; i < Elements.Length; i++)
 		{
-			var e = elements[i];
+			var e = Elements[i];
 			sb.Append(e.ToString());
-			if (i < elements.Count - 1)
+			if (i < Elements.Length - 1)
 			{
 				sb.Append(' ');
 			}
@@ -49,23 +49,24 @@ public class GroupExpr : SExpr
 public class DeclareExpr : SExpr
 {
 	public readonly string Identifier;
-	public readonly Expr[] elements;
+	public readonly SymbolExpr[] Arguments;
 
-	public DeclareExpr(string identifier, List<Expr> expressions) : base(expressions)
+	public DeclareExpr(string identifier, List<SymbolExpr> symbols, List<Expr> expressions) : base(expressions)
 	{
 		Identifier = identifier;
-		elements = expressions.ToArray();
+		Arguments = symbols.ToArray();
+		Elements = expressions.ToArray();
 	}
 
 	public override string ToString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.Append('{');
-		for (var i = 0; i < elements.Length; i++)
+		for (var i = 0; i < Elements.Length; i++)
 		{
-			var e = elements[i];
+			var e = Elements[i];
 			sb.Append(e.ToString());
-			if (i < elements.Length - 1)
+			if (i < Elements.Length - 1)
 			{
 				sb.Append(' ');
 			}

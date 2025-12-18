@@ -1,13 +1,16 @@
-﻿namespace LangJam;
+﻿using LangJam.Loader.AST;
+
+namespace LangJam;
 
 public class ComponentBase : RuntimeBase
 {
-	protected Scene _myScene;
+	protected Scene _myScene;//todo:remove. use scene in runtimeBase
 	protected string ComponentName { get; set; }
 
 	public ComponentBase(string name, Game game, Scene scene) : base(game, scene)
 	{
 		ComponentName = name;
+		_myScene = scene;
 	}
 
 	public virtual string Name()
@@ -22,7 +25,7 @@ public class ComponentBase : RuntimeBase
 		}
 		else
 		{
-			return false;
+			return true;
 		}
 	}
 
@@ -45,6 +48,18 @@ public class ComponentBase : RuntimeBase
 			{
 				Scene.SetProperty(key, val, createIfDoesntExist);
 			}
+		}
+	}
+
+	public override bool TryGetMethod(string id, out DeclareExpr expr)
+	{
+		if (!Methods.TryGetValue(id, out expr))
+		{
+			return _myScene.TryGetMethod(id, out expr);
+		}
+		else
+		{
+			return true;
 		}
 	}
 }

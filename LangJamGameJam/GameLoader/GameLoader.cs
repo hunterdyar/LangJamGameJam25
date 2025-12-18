@@ -103,13 +103,13 @@ public static class GameLoader
 			{
 				foreach (var compExpression in comps)
 				{
-					for (var i = 1; i < compExpression.elements.Count; i++)//start at 1 to skip "components"
+					for (var i = 1; i < compExpression.Elements.Length; i++)//start at 1 to skip "components"
 					{
-						var comp = compExpression.elements[i];
+						var comp = compExpression.Elements[i];
 						var c = comp.ToString();
 						if (!string.IsNullOrEmpty(c) )
 						{
-							compNames.Add(c); //should this be comp
+							compNames.Add(c);
 						}
 					}
 				}

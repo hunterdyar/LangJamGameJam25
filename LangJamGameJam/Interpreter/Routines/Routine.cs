@@ -21,9 +21,9 @@ public class Routine
 	private IEnumerator<YieldInstruction?> RoutineBlock()
 	{
 		//1; skip 'start-routine'
-		for (var i = 1; i < _block.elements.Count; i++)
+		for (var i = 1; i < _block.Elements.Length; i++)
 		{
-			var n = _context.Game.Interpreter.WalkStatement(_block.elements[i], _context);
+			var n = _context.Game.Interpreter.WalkStatement(_block.Elements[i], _context);
 			if (n == null)
 			{
 				continue;

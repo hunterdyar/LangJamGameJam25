@@ -5,14 +5,15 @@ using LangJam.Loader.AST;
 
 public class Interpreter
 {
+	private Stack<RuntimeObject> _returnValues = new Stack<RuntimeObject>();
 	//control-flow if
-	private IEnumerator<YieldInstruction> CFIf(SExpr sexpr, RuntimeBase context)
+	private IEnumerator<YieldInstruction?> CFIf(SExpr sexpr, RuntimeBase context)
 	{
 		//id ("if") is 0
-		var compare = WalkExpression(sexpr.elements[1], context);
+		var compare = WalkExpression(sexpr.Elements[1], context);
 		if (compare.AsBool())
 		{
-			var n = WalkStatement(sexpr.elements[2], context);
+			var n = WalkStatement(sexpr.Elements[2], context);
 			while (n != null && n.MoveNext())
 			{
 				continue;
@@ -20,9 +21,9 @@ public class Interpreter
 		}
 		else
 		{
-			if (sexpr.elements.Count == 4)//if,comp,cons,alt
+			if (sexpr.Elements.Length == 4)//if,comp,cons,alt
 			{
-				var n = WalkStatement(sexpr.elements[3], context);
+				var n = WalkStatement(sexpr.Elements[3], context);
 				while (n!=null && n.MoveNext())
 				{
 					continue;
@@ -38,33 +39,33 @@ public class Interpreter
 		//id ("for") is 0
 		//for index list do
 		var frame = new FrameContext(context);
-		if (sexpr.elements.Count == 4)
+		if (sexpr.Elements.Length == 4)
 		{
-			var range = WalkExpression(sexpr.elements[2], frame).AsList().Value;
-			var iterName = WalkExpression(sexpr.elements[1], frame).AsSymbol();
+			var range = WalkExpression(sexpr.Elements[2], frame).AsList().Value;
+			var iterName = WalkExpression(sexpr.Elements[1], frame).AsSymbol();
 			foreach (var ro in range)
 			{
 				//todo: stacks! for loops operate on entity variables.
 				frame.SetProperty(iterName, ro, true);
-				var n = WalkStatement(sexpr.elements[3], frame);
+				var n = WalkStatement(sexpr.Elements[3], frame);
 				while (n != null && n.MoveNext())
 				{
 					yield return n.Current;
 				}
 			}
-		}else if (sexpr.elements.Count == 5)
+		}else if (sexpr.Elements.Length == 5)
 		{
 			//for index value list do
-			var indexName = WalkExpression(sexpr.elements[1], frame).AsSymbol();
-			var iterName = WalkExpression(sexpr.elements[2], frame).AsSymbol();
-			var range = WalkExpression(sexpr.elements[3], frame).AsList().Value;
+			var indexName = WalkExpression(sexpr.Elements[1], frame).AsSymbol();
+			var iterName = WalkExpression(sexpr.Elements[2], frame).AsSymbol();
+			var range = WalkExpression(sexpr.Elements[3], frame).AsList().Value;
 			for (var i = 0; i < range.Count; i++)
 			{
 				var ro = range[i];
 				//todo: stacks! for loops operate on entity variables.
 				frame.SetProperty(indexName, new LJNumber(i), true);
 				frame.SetProperty(iterName, ro, true);
-				var n = WalkStatement(sexpr.elements[4], frame);
+				var n = WalkStatement(sexpr.Elements[4], frame);
 				while (n != null && n.MoveNext())
 				{
 					continue;
@@ -78,11 +79,41 @@ public class Interpreter
 		IEnumerator<YieldInstruction?> n;
 		switch (expr)
 		{
+			case NumberConstant numberConstant:
+				_returnValues.Push(numberConstant.RuntimeValue);
+				break;
+			case StringConstant stringConstant:
+				_returnValues.Push(stringConstant.RuntimeValue);
+				break;
+			case SymbolExpr symbolConstant:
+				_returnValues.Push(new LJSymbol(symbolConstant.Value));
+				break;
+			case IdentifierConstant identifier:
+				if (context.TryGetProperty(identifier.Value, out var value))
+				{
+					_returnValues.Push(value);
+				}
+				else
+				{
+					throw new Exception($"Unable to get variable {identifier} on {context}");
+				}
+				break;
+			case BooleanExpr booleanExpr:
+				var o = WalkExpression(booleanExpr.Expr, context);
+				//if it's a list, false for empty true for contains
+				//number is non-zero
+				//identifiers are true/false/error
+				//string is type-error.
+				_returnValues.Push(new LJBool(o.AsBool()));
+				break;
+			case KeyExpr keyExpr:
+				_returnValues.Push(new LJKey(keyExpr.Value));
+				break;
 			case DeclareExpr declareExpr:
-				//still calling 'root functions' on init, but we ... shouldnt?
+				//these have already been declared. so, ignore!
 				break;
 			case GroupExpr groupExpr:
-				foreach (var item in groupExpr.elements)
+				foreach (var item in groupExpr.Elements)
 				{
 					n = WalkStatement(item, context);
 					while (n!= null && n.MoveNext())
@@ -113,6 +144,17 @@ public class Interpreter
 					case "while":
 						// return CF(sexpr, context);
 						throw new NotImplementedException();
+					case "return":
+						n = WalkStatement(sexpr.Elements[1], context);
+						while (n != null && n.MoveNext())
+						{
+							yield return n.Current;
+							//we do not wait for yields in the root
+							continue;
+						}
+						//and then we push the value? that's? already been pushed?
+						//and then uh. we. abort the call. this won't workkkk?
+						break;
 					case "start-routine":
 						n = CFRoutine(sexpr, context);
 						while (n != null && n.MoveNext())
@@ -122,14 +164,14 @@ public class Interpreter
 						break;
 					case "yield":
 						//pardon me for my sins. yields must only have one instruction... and they cannot be references? shit!
-						var ryiSexpr = sexpr.elements[1] as SExpr;
+						var ryiSexpr = sexpr.Elements[1] as SExpr;
 						if (RoutineFunctions.Yields.TryGetValue(ryiSexpr.Key.Value, out var y))
 						{
 							//a call to 'yield' that returns the yieldinstruction
-							var args = new RuntimeObject[ryiSexpr.elements.Count - 1];
-							for (int i = 1; i < ryiSexpr.elements.Count; i++)
+							var args = new RuntimeObject[ryiSexpr.Elements.Length - 1];
+							for (int i = 1; i < ryiSexpr.Elements.Length; i++)
 							{
-								var ro = WalkExpression(ryiSexpr.elements[i], context);
+								var ro = WalkExpression(ryiSexpr.Elements[i], context);
 								args[i - 1] = ro;
 							}
 							//create the actual YieldInstruction
@@ -150,10 +192,10 @@ public class Interpreter
 				{
 					if (Builtins.BuiltinFunctions.TryGetValue(id, out var call))
 					{
-						var args = new RuntimeObject[sexpr.elements.Count - 1];
-						for (int i = 1; i < sexpr.elements.Count; i++)
+						var args = new RuntimeObject[sexpr.Elements.Length - 1];
+						for (int i = 1; i < sexpr.Elements.Length; i++)
 						{
-							var ro = WalkExpression(sexpr.elements[i], context);
+							var ro = WalkExpression(sexpr.Elements[i], context);
 							args[i - 1] = ro;
 						}
 
@@ -186,45 +228,35 @@ public class Interpreter
 		}
 	}
 
+	public void WalkDeclaredExpr(DeclareExpr expr, RuntimeBase context, RuntimeObject[] args)
+	{
+		if (args.Length != expr.Arguments.Length)
+		{
+			throw new Exception($"wrong number of arguments for function {expr.Identifier} in {context}");
+		}
+		for (int i = 0; i < expr.Elements.Length; i++)
+		{
+			var n = WalkStatement(expr.Elements[i], context);
+			while (n != null && n.MoveNext())
+			{
+				//we do not wait for yields in the root
+				continue;
+			}
+		}
+	}
+
 	//we anticipate a value to be spit out here... but all expressions are values...
-	private RuntimeObject WalkExpression(Expr expr, RuntimeBase context, Routine? routineContext = null)
+	private RuntimeObject WalkExpression(Expr expr, RuntimeBase context)
 	{
 		switch (expr)
 		{
-			case NumberConstant numberConstant:
-				return numberConstant.RuntimeValue;
-			case StringConstant stringConstant:
-				return stringConstant.RuntimeValue;
-			case SymbolExpr symbolConstant:
-				return new LJSymbol(symbolConstant.Value);
-			case GroupExpr groupExpr:
-				throw new NotImplementedException("group values constants not supported");
-			case IdentifierConstant identifier:
-				if (context.TryGetProperty(identifier.Value.ToString(), out var value))
-				{
-					return value;
-				}
-				else
-				{
-					throw new Exception($"Unable to get variable {identifier} on {context}");
-				}
-			case BooleanExpr booleanExpr:
-				var o = WalkExpression(booleanExpr.Expr, context);
-				//if it's a list, false for empty true for contains
-				//number is non-zero
-				//identifiers are true/false/error
-				//string is type-error.
-				return new LJBool(o.AsBool());
-				break;
-			case KeyExpr keyExpr:
-				return new LJKey(keyExpr.Value);
 			case SExpr sexpr:
 				if (Builtins.BuiltinFunctions.TryGetValue(sexpr.Key.ToString(), out var call))
 				{
-					var args = new RuntimeObject[sexpr.elements.Count - 1];
-					for (int i = 1; i < sexpr.elements.Count; i++)
+					var args = new RuntimeObject[sexpr.Elements.Length - 1];
+					for (int i = 1; i < sexpr.Elements.Length; i++)
 					{
-						var ro = WalkExpression(sexpr.elements[i], context);
+						var ro = WalkExpression(sexpr.Elements[i], context);
 						args[i - 1] = ro;
 					}
 
@@ -245,6 +277,13 @@ public class Interpreter
 				break;
 		}
 
-		throw new NotImplementedException();
+		//if not a sexpr...
+		var n = WalkStatement(expr, context);
+		while (n != null && n.MoveNext())
+		{
+			//uhg, this should go up the chain?	
+		}
+
+		return _returnValues.Pop();
 	}
 }
