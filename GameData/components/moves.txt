@@ -2,8 +2,16 @@
 	(set @taking-turn 0)
 }
 
+{can-move-to @x
+[
+
+
+(return true)
+]
+}
 
 {move-left
+	(if (can-move-to :x) (print "can move"))
  (if (eq :taking-turn 1) (print "fuck")
 	 (if (gt :x 0)
 		(start-routine

@@ -3,7 +3,6 @@
 public class FrameContext : RuntimeBase
 {
 	private IStackContext Parent;
-
 	public FrameContext(RuntimeBase parent) : base(parent.Game, parent.Scene)
 	{
 		Parent = parent;

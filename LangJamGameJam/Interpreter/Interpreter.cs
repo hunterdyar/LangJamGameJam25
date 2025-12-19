@@ -1,4 +1,5 @@
-﻿using LangJam;
+﻿using System.Diagnostics;
+using LangJam;
 using LangJam.Loader.AST;
 
 public class Interpreter
@@ -103,7 +104,18 @@ public class Interpreter
 				_returnValues.Push(new LJBool(o.AsBool()));
 				break;
 			case KeyExpr keyExpr:
-				_returnValues.Push(new LJKey(keyExpr.Value));
+				if (keyExpr.Value == "true")
+				{
+					_returnValues.Push(new LJBool(true));
+				}else if (keyExpr.Value == "false")
+				{
+					_returnValues.Push(new LJBool(false));
+				}
+				else
+				{
+					_returnValues.Push(new LJKey(keyExpr.Value));
+				}
+
 				break;
 			case DeclareExpr declareExpr:
 				//these have already been declared. so, ignore!
@@ -142,13 +154,9 @@ public class Interpreter
 						throw new NotImplementedException();
 					case "return":
 						//todo
-						n = WalkStatement(sexpr.Elements[1], context);
-						while (n != null && n.MoveNext())
-						{
-							yield return n.Current;
-						}
-						
-						//and then we push the value? that's? already been pushed?
+						var x = WalkExpression(sexpr.Elements[1], context);
+						_returnValues.Push(x);
+						//todo: abort!
 						//and then uh. we. abort the call. this won't workkkk?
 						break;
 					case "start-routine":
@@ -199,7 +207,22 @@ public class Interpreter
 					}
 					else
 					{
-						throw new Exception($"Unknown call to '{id} for {context}");
+						//call a local declared function
+						if(context.TryGetMethod(id, out var declareExpr))
+						{
+							var args = new RuntimeObject[sexpr.Elements.Length - 1];
+							for (int i = 1; i < sexpr.Elements.Length; i++)
+							{
+								var ro = WalkExpression(sexpr.Elements[i], context);
+								args[i - 1] = ro;
+							}
+							//todo:should this be able to yield? uhhh
+							WalkDeclaredExpr(declareExpr,context, args);
+						}
+						else
+						{
+							throw new Exception($"Unknown call to '{id} for {context}");
+						}
 					}
 					//check if there are constants...
 				}
@@ -233,19 +256,28 @@ public class Interpreter
 			throw new Exception($"wrong number of arguments for function {expr.Identifier} in {context}");
 		}
 
+		var frameContext = new FrameContext(context);
 		if (args.Length > 0)
 		{
-			throw new NotImplementedException();
+			for (var i = 0; i < args.Length; i++)
+			{
+				var id = expr.Arguments[i];
+				var val = args[i];
+				frameContext.SetProperty(id.Value,val, true);
+			}
 		}
+
 		for (int i = 0; i < expr.Elements.Length; i++)
 		{
-			var n = WalkStatement(expr.Elements[i], context);
+			var n = WalkStatement(expr.Elements[i], frameContext);
 			while (n != null && n.MoveNext())
 			{
 				//todo:yield?
 				continue;
 			}
 		}
+		
+		//and then destroy frame context... but we set nothing...
 	}
 
 	//we anticipate a value to be spit out here... but all expressions are values...
@@ -275,19 +307,28 @@ public class Interpreter
 				}
 				else
 				{
-					throw new Exception($"unknown call to {sexpr.Key.ToString()}");
+					break;
 				}
 				break;
 		}
 
 		//if not a sexpr...
+		int _returnStackCount = _returnValues.Count;
 		var n = WalkStatement(expr, context);
 		while (n != null && n.MoveNext())
 		{
 			continue;
 		}
 
-		return _returnValues.Pop();
+		if (_returnValues.Count == _returnStackCount + 1)
+		{
+			return _returnValues.Pop();
+		}
+		else
+		{
+			//uh oh!
+			return _returnValues.Pop();
+		}
 	}
 
 
