@@ -22,7 +22,9 @@ public static class Builtins
 			{ "call-up", CallUp },
 			{ "broadcast", Broadcast },
 			{ "print", Print },
-			
+			{ "find-type", FindOfType},
+			{ "find-all-of-type", FindAllOfType },
+
 			//list
 			{ "range", Range },
 			{ "list", List },
@@ -50,9 +52,9 @@ public static class Builtins
 			{ "floor", MathFunctions.UnOp(Math.Floor) },
 			{ "ceil", MathFunctions.UnOp(Math.Ceiling) },
 			{ "round", MathFunctions.UnOp(Math.Round) },
-			{ "ease-in", MathFunctions.UnOp(MathFunctions.EaseInExpo)},
-			{ "ease-out", MathFunctions.UnOp(MathFunctions.EaseOutExpo) },
-			{ "ease-in-out", MathFunctions.UnOp(MathFunctions.EaseInOutExpo) },
+			{ "ease-in", MathFunctions.UnOp(MathFunctions.EaseInCirc)},
+			{ "ease-out", MathFunctions.UnOp(MathFunctions.EaseOutCirc) },
+			{ "ease-in-out", MathFunctions.UnOp(MathFunctions.EaseInOutCirc) },
 
 			//easings
 			
@@ -70,14 +72,42 @@ public static class Builtins
 			{ "equal", IsEqualTo}
 		};
 
+	private static RuntimeObject? FindAllOfType(RuntimeBase context, RuntimeObject[] args)
+	{
+		var sceneTypeName = args[0].AsString();
+		LJList foundAllOfType = new LJList();
 
+		if (sceneTypeName == "main")
+		{
+			foundAllOfType.Value.Add(new LJSceneReference(context.Game._rootScene));
+		}
 
-	private static RuntimeObject? List(RuntimeBase arg1, RuntimeObject[] args)
+		context.Game._rootScene.FindAllChildSceneOfTypeRecursive(sceneTypeName, ref foundAllOfType);
+		return foundAllOfType;
+	}
+
+	private static RuntimeObject? FindOfType(RuntimeBase context, RuntimeObject[] args)
+	{
+		var sceneTypeName = args[0].AsString();
+		if (sceneTypeName == "main")
+		{
+			return new LJSceneReference(context.Game._rootScene);
+		}
+
+		if(context.Game._rootScene.TryFindChildSceneOfTypeRecursive(sceneTypeName, out var scene))
+		{
+			return new LJSceneReference(scene);
+		}
+
+		throw new Exception($"Unable to find-of object of type {sceneTypeName}. hint: should be lowercase.");
+	}
+	
+	private static RuntimeObject? List(RuntimeBase context, RuntimeObject[] args)
 	{
 		return new LJList(args.ToList());
 	}
 
-	private static RuntimeObject? Count(RuntimeBase arg1, RuntimeObject[] args)
+	private static RuntimeObject? Count(RuntimeBase context, RuntimeObject[] args)
 	{
 		var list = args[0].AsList();
 		return new LJNumber(list.Value.Count);

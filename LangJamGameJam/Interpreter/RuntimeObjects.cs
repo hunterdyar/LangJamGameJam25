@@ -126,7 +126,7 @@ public class LJKey : LJString
 
 	public override string ToString()
 	{
-		return $"Key({Value}";
+		return $"Key({Value})";
 	}
 }
 
@@ -310,14 +310,14 @@ public class LJComponentReference : LJRuntimeBaseReference
 
 public class LJList : RuntimeObject<List<RuntimeObject>>
 {
-	public LJList()
-	{
-		_value = new List<RuntimeObject>();
-	}
-
 	public LJList(List<RuntimeObject> list)
 	{
 		_value = list;
+	}
+
+	public LJList()
+	{
+		_value = new List<RuntimeObject>();
 	}
 	public override double AsNumber()
 	{

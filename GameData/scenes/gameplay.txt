@@ -2,6 +2,8 @@
 
 {on-spawn
 	(set @player (spawn player))
+	(set @enemy1 (spawn simpleenemy))
+	(set-in :enemy1 x 2)
 	(set-in grid scale 100)
 	(set-in grid x-offset 0)
 	(set-in grid y-offset -100)

@@ -1,4 +1,5 @@
-﻿using LangJam.Loader.AST;
+﻿using System.Diagnostics.CodeAnalysis;
+using LangJam.Loader.AST;
 
 namespace LangJam;
 
@@ -198,6 +199,41 @@ public class Scene : RuntimeBase
 						$"Unable to set property {key} on {this}. To crate a new variable, use the @symbol. e.g. (set @{key} {val})");
 				}
 			}
+		}
+	}
+
+	public bool TryFindChildSceneOfTypeRecursive(string sceneTypeName, [NotNullWhen(true)] out Scene? scene)
+	{
+		foreach (var child in _children)
+		{
+			if (child._definition.EntityDefName == sceneTypeName)
+			{
+				scene = child;
+				return true;
+			}
+			else
+			{
+				if (child.TryFindChildSceneOfTypeRecursive(sceneTypeName, out scene))
+				{
+					return true;
+				}
+			}
+		}
+
+		scene = null;
+		return false;
+	}
+
+	public void FindAllChildSceneOfTypeRecursive(string sceneTypeName, ref LJList found)
+	{
+		foreach (var child in _children)
+		{
+			if (child._definition.EntityDefName == sceneTypeName)
+			{
+				found.Value.Add(new LJSceneReference(child));
+			}
+			
+			child.FindAllChildSceneOfTypeRecursive(sceneTypeName, ref found);
 		}
 	}
 }

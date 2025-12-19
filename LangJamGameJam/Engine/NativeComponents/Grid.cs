@@ -55,13 +55,13 @@ public class Grid : NativeComponent
 		switch (id)
 		{
 			case "get-scene-at":
-				// todo: replace returning the tree with "call method"
-				
+				throw new NotImplementedException("get scene at goes here....");
 				break;
 		}
 			
 		return base.TryGetMethod(id, out expr);
 	}
+	
 
 	public override void SetProperty(string key, RuntimeObject val, bool forceCreate)
 	{

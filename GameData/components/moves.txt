@@ -11,7 +11,7 @@
 			(set @rx :x)#base x
 			(for @t (range 0 (get-from :g scale))
 			[
-				(set x (sub :rx (div :t (get-from :g scale))))
+				(set x (sub :rx (ease-in-out (div :t (get-from :g scale)))))
 				(yield (seconds (div .5  (get-from :g scale))))
 			]
 			)
@@ -30,7 +30,7 @@
 				(set @rx :x)#base x
 				(for @t (range 0 (get-from :g scale))
 				[
-					(set x (add :rx (sub 1 (ease-out (div :t (get-from :g scale))))))
+					(set x (add :rx (ease-in-out (div :t (get-from :g scale)))))
 					(yield (seconds (div .5  (get-from :g scale))))
 				]
 				)

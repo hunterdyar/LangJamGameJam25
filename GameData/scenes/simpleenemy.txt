@@ -1,0 +1,16 @@
+(components moves)
+{on-spawn
+	(set @x 0)
+	(set @y 0)
+	(set @facing 1)
+	(set @g (find-comp-in-parent grid))
+}
+
+{render
+	(if (eq :facing 1)
+		(draw-grid-sprite :g (get x) (get y) evil-stone)
+		(if (eq :facing -1)
+			(draw-grid-sprite :g (get x) (get y) evil-stone)
+		)
+	)
+}
