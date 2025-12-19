@@ -1,6 +1,4 @@
-﻿using HelloWorld;
-using HelloWorld.Interpreter;
-using LangJam;
+﻿using LangJam;
 using LangJam.Loader.AST;
 
 public class Interpreter
@@ -16,7 +14,7 @@ public class Interpreter
 			var n = WalkStatement(sexpr.Elements[2], context);
 			while (n != null && n.MoveNext())
 			{
-				continue;
+				yield return n.Current;
 			}
 		}
 		else
@@ -24,14 +22,12 @@ public class Interpreter
 			if (sexpr.Elements.Length == 4)//if,comp,cons,alt
 			{
 				var n = WalkStatement(sexpr.Elements[3], context);
-				while (n!=null && n.MoveNext())
+				while (n != null && n.MoveNext())
 				{
-					continue;
+					yield return n.Current;
 				}
 			}
 		}
-
-		return null;
 	}
 
 	private IEnumerator<YieldInstruction?> CFFor(SExpr sexpr, RuntimeBase context)
@@ -68,7 +64,7 @@ public class Interpreter
 				var n = WalkStatement(sexpr.Elements[4], frame);
 				while (n != null && n.MoveNext())
 				{
-					continue;
+					yield return n.Current;
 				}
 			}
 		}
@@ -145,13 +141,13 @@ public class Interpreter
 						// return CF(sexpr, context);
 						throw new NotImplementedException();
 					case "return":
+						//todo
 						n = WalkStatement(sexpr.Elements[1], context);
 						while (n != null && n.MoveNext())
 						{
 							yield return n.Current;
-							//we do not wait for yields in the root
-							continue;
 						}
+						
 						//and then we push the value? that's? already been pushed?
 						//and then uh. we. abort the call. this won't workkkk?
 						break;
@@ -196,7 +192,6 @@ public class Interpreter
 						for (int i = 1; i < sexpr.Elements.Length; i++)
 						{
 							var ro = WalkExpression(sexpr.Elements[i], context);
-							
 							args[i - 1] = ro;
 						}
 
@@ -225,9 +220,11 @@ public class Interpreter
 		var n = context.Game.RoutineSystem.StartRoutine(routine);
 		while (n != null && n.MoveNext())
 		{
-			continue;
+			yield return n.Current;
 		}
 	}
+	
+	
 
 	public void WalkDeclaredExpr(DeclareExpr expr, RuntimeBase context, RuntimeObject[] args)
 	{
@@ -245,7 +242,7 @@ public class Interpreter
 			var n = WalkStatement(expr.Elements[i], context);
 			while (n != null && n.MoveNext())
 			{
-				//we do not wait for yields in the root
+				//todo:yield?
 				continue;
 			}
 		}
@@ -287,9 +284,11 @@ public class Interpreter
 		var n = WalkStatement(expr, context);
 		while (n != null && n.MoveNext())
 		{
-			//uhg, this should go up the chain?	
+			continue;
 		}
 
 		return _returnValues.Pop();
 	}
+
+
 }
