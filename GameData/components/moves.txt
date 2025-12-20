@@ -7,9 +7,10 @@
 	(print :space)
 	(if (gte :space (get-from :g cols)) (return false))
 	(if (lt :space 0) (return false))
-	(for @i @entity (children :board)
-		(print "oh")
-		(if (eq (get-from :entity x) :x) (return false))
+	(for @entity (children :board)
+		[
+		(if (eq (get-from :entity x) :space) [(return false)])
+		]
 	)
 	(return true)
 }

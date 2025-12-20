@@ -256,11 +256,7 @@ public static class Builtins
 			throw new Exception($"Cannot set-in {context}. needs component key (name) or entity/component reference");
 		}
 
-		bool create = false;
-		if (args[1] is LJSymbol)
-		{
-			create = true;
-		}
+		bool create = args[1] is LJSymbol;
 		var key = args[1].AsString();
 		var val = args[2];
 
