@@ -14,7 +14,16 @@ public static class MathFunctions
 	{
 		return new LJNumber(args[0].AsNumber() - 1);
 	}
-	
+
+	public static Func<RuntimeBase, RuntimeObject[], RuntimeObject?> UnBool(Func<bool, bool> op)
+	{
+		return new Func<RuntimeBase, RuntimeObject[], RuntimeObject?>((context, args) =>
+		{
+			var left = args[0].AsBool();
+			var result = op.Invoke(left);
+			return new LJBool(result);
+		});
+	}
 	public static Func<RuntimeBase, RuntimeObject[], RuntimeObject?> BinComp(Func<double,double,bool> op)
 	{
 		return new Func<RuntimeBase, RuntimeObject[], RuntimeObject?>((context, args) =>
@@ -46,6 +55,10 @@ public static class MathFunctions
 			return new LJNumber(result);
 		});
 	}
+
+	#region Easings
+
+	
 
 	public static double Clamp01(double x)
 	{
@@ -218,4 +231,8 @@ public static class MathFunctions
 				return 0.5f * EaseOutBounce(x * 2 - 1) + 0.5f;
 			}
 		}
-	}
+
+		#endregion
+
+	
+}

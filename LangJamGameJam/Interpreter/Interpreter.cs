@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using HelloWorld.Interpreter;
 using LangJam;
 using LangJam.Loader.AST;
 
@@ -16,6 +17,10 @@ public class Interpreter
 			while (n != null && n.MoveNext())
 			{
 				yield return n.Current;
+				if (n.Current != null && !n.Current.ContinueAfter)
+				{
+					break;
+				}
 			}
 		}
 		else
@@ -26,6 +31,10 @@ public class Interpreter
 				while (n != null && n.MoveNext())
 				{
 					yield return n.Current;
+					if (n.Current != null && !n.Current.ContinueAfter)
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -48,6 +57,10 @@ public class Interpreter
 				while (n != null && n.MoveNext())
 				{
 					yield return n.Current;
+					if (n.Current != null && !n.Current.ContinueAfter)
+					{
+						break;
+					}
 				}
 			}
 		}else if (sexpr.Elements.Length == 5)
@@ -66,6 +79,10 @@ public class Interpreter
 				while (n != null && n.MoveNext())
 				{
 					yield return n.Current;
+					if (n.Current != null && !n.Current.ContinueAfter)
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -124,9 +141,13 @@ public class Interpreter
 				foreach (var item in groupExpr.Elements)
 				{
 					n = WalkStatement(item, context);
-					while (n!= null && n.MoveNext())
+					while (n != null && n.MoveNext())
 					{
 						yield return n.Current;
+						if (n.Current != null && !n.Current.ContinueAfter)
+						{
+							break;
+						}
 					}
 				}
 				break;
@@ -140,6 +161,10 @@ public class Interpreter
 						while (n != null && n.MoveNext())
 						{
 							yield return n.Current;
+							if (n.Current != null && !n.Current.ContinueAfter)
+							{
+								break;
+							}
 						}
 						break;
 					case "for":
@@ -147,6 +172,10 @@ public class Interpreter
 						while (n != null && n.MoveNext())
 						{
 							yield return n.Current;
+							if (n.Current != null && !n.Current.ContinueAfter)
+							{
+								break;
+							}
 						}
 						break;
 					case "while":
@@ -157,11 +186,12 @@ public class Interpreter
 						var x = WalkExpression(sexpr.Elements[1], context);
 						_returnValues.Push(x);
 						//todo: abort!
+						yield return new EarlyReturn();
 						//and then uh. we. abort the call. this won't workkkk?
 						break;
 					case "start-routine":
 						n = CFRoutine(sexpr, context);
-						while (n != null && n.MoveNext())
+						while (n != null && n.MoveNext() && (n.Current == null || n.Current.ContinueAfter))
 						{
 							yield return n.Current;
 						}
@@ -244,6 +274,10 @@ public class Interpreter
 		while (n != null && n.MoveNext())
 		{
 			yield return n.Current;
+			if (n.Current != null && !n.Current.ContinueAfter)
+			{
+				break;
+			}
 		}
 	}
 	
@@ -272,8 +306,11 @@ public class Interpreter
 			var n = WalkStatement(expr.Elements[i], frameContext);
 			while (n != null && n.MoveNext())
 			{
-				//todo:yield?
-				continue;
+				//yield return n.Current;
+				if (n.Current != null && !n.Current.ContinueAfter)
+				{
+					return;
+				}
 			}
 		}
 		
@@ -315,10 +352,25 @@ public class Interpreter
 		//if not a sexpr...
 		int _returnStackCount = _returnValues.Count;
 		var n = WalkStatement(expr, context);
-		while (n != null && n.MoveNext())
+		if (n != null)
 		{
-			continue;
+			if (n.Current != null)
+			{
+				if (n.Current is EarlyReturn er)
+				{
+					Console.WriteLine("womp");
+				}
+			}
+			
+			while (n.MoveNext())
+			{
+				if (n.Current != null && !n.Current.ContinueAfter)
+				{
+					break;
+				}
+			}
 		}
+
 
 		if (_returnValues.Count == _returnStackCount + 1)
 		{

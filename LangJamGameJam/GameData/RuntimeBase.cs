@@ -142,26 +142,6 @@ public abstract class RuntimeBase : IStackContext
 		}
 	}
 
-	public virtual void SetProperty(string key, RuntimeObject val, bool createIfDoesntExist)
-	{
-		if (createIfDoesntExist)
-		{
-			if (!Properties.TryAdd(key, val))
-			{
-				Properties[key] = val;
-			}
-		}
-		else
-		{
-			if (Properties.ContainsKey(key))
-			{
-				Properties[key] = val;
-			}
-			else
-			{
-				//must not be ours, fail upwards!
-				Scene.SetProperty(key, val, createIfDoesntExist);
-			}
-		}
-	}
+	public abstract void SetProperty(string key, RuntimeObject val, bool createIfDoesntExist);
+
 }

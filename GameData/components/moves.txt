@@ -1,38 +1,42 @@
 {on-spawn
 	(set @taking-turn 0)
+	(set @board (find-type gameplay))
 }
 
-{can-move-to @x
-[
-
-
-(return true)
-]
+{can-move-to @space
+	(print :space)
+	(if (gte :space (get-from :g cols)) (return false))
+	(if (lt :space 0) (return false))
+	(for @i @entity (children :board)
+		(print "oh")
+		(if (eq (get-from :entity x) :x) (return false))
+	)
+	(return true)
 }
 
 {move-left
-	(if (can-move-to :x) (print "can move"))
- (if (eq :taking-turn 1) (print "fuck")
-	 (if (gt :x 0)
-		(start-routine
-			(set taking-turn 1)
-			(set @rx :x)#base x
-			(for @t (range 0 (get-from :g scale))
-			[
-				(set x (sub :rx (ease-in-out (div :t (get-from :g scale)))))
-				(yield (seconds (div .5  (get-from :g scale))))
-			]
+	 (if (eq :taking-turn 1) (print "fuck")
+	 	[(if (can-move-to (round (sub :x 1)))
+			(start-routine
+				(set taking-turn 1)
+				(set @rx :x)#base x
+				(for @t (range 0 (get-from :g scale))
+					[
+						(set x (sub :rx (ease-in-out (div :t (get-from :g scale)))))
+						(yield (seconds (div .5  (get-from :g scale))))
+					]
+				)
+				(set @x (sub :rx 1))
+				(set taking-turn 0)
 			)
-			(set @x (sub :rx 1))
-			(set taking-turn 0)
-		)
-	  )
-  )
+		 ) 
+		 (print "cant move")
+	  ])
 }
 
 {move-right
  (if (eq :taking-turn 1) (print "fuck")
-		(if (lt :x (dec (get-from :g cols) 1))
+		[(if (can-move-to (round (add :x 1)))
 			(start-routine
 				(set taking-turn 1)
 				(set @rx :x)#base x
@@ -46,6 +50,7 @@
 				(set taking-turn 0)
 			)
 		)
+		]
 	)
 }
 {move-swap

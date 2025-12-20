@@ -4,6 +4,7 @@
 public abstract class YieldInstruction : IEnumerator
 {
 	public abstract bool KeepWaiting();
+	public virtual bool ContinueAfter => true;
 
 	public bool MoveNext()
 	{

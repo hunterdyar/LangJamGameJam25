@@ -112,10 +112,16 @@ public class Game : IStackContext
 	{
 		throw new Exception("globals not supported");
 	}
+
+	public bool TryGetMethod(string id, out DeclareExpr expr)
+	{
+		throw new Exception("not how this works bub");
+	}
 }
 
 public interface IStackContext
 {
 	public bool TryGetProperty(string id, out RuntimeObject runtimeObject);
 	public void SetProperty(string id, RuntimeObject val, bool createIfDoesntExist);
+	public bool TryGetMethod(string id, out DeclareExpr expr);
 }

@@ -24,6 +24,7 @@ public static class Builtins
 			{ "print", Print },
 			{ "find-type", FindOfType},
 			{ "find-all-of-type", FindAllOfType },
+			{ "children", Children},
 
 			//list
 			{ "range", Range },
@@ -68,9 +69,28 @@ public static class Builtins
 			{ "less-than", MathFunctions.BinComp(((a , b) => a<b))},
 			{ "lte", MathFunctions.BinComp(((a , b) => a<=b))},
 			{ "less-than-equal", MathFunctions.BinComp(((a , b) => a<=b))},
+			{ "not", MathFunctions.UnBool(((a) => !a)) },
+
 			{ "eq", IsEqualTo},
 			{ "equal", IsEqualTo}
 		};
+
+	private static RuntimeObject? Children(RuntimeBase context, RuntimeObject[] args)
+	{
+		if (args[0] is LJRuntimeBaseReference lrb)
+		{
+			LJList list = new LJList();
+			foreach (var child in lrb.Value.Scene.Children)
+			{
+				list.Value.Add(new LJSceneReference(child));
+			}
+
+			return list;
+		}
+
+		throw new Exception("can't get children, is not scene or component.");
+	}
+
 
 	private static RuntimeObject? FindAllOfType(RuntimeBase context, RuntimeObject[] args)
 	{
