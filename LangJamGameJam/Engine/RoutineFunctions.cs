@@ -8,7 +8,7 @@ public static class RoutineFunctions
 			{ "seconds", WaitForSeconds },
 			{ "frames", WaitForFrames},
 		};
-
+	
 	private static YieldInstruction? WaitForFrames(RuntimeBase context, RuntimeObject[] args)
 	{
 		var frames = args[0].AsNumber();

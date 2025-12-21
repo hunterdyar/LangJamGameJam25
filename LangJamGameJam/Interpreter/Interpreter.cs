@@ -199,6 +199,16 @@ public class Interpreter
 					case "yield":
 						//pardon me for my sins. yields must only have one instruction... and they cannot be references? shit!
 						var ryiSexpr = sexpr.Elements[1] as SExpr;
+						if (ryiSexpr.Key.Value == "start-routine")
+						{
+							n = WalkStatement(ryiSexpr, context);
+							if (n.Current != null && !n.Current.ContinueAfter)
+							{
+								break;
+							}
+							break;
+						}
+						
 						if (RoutineFunctions.Yields.TryGetValue(ryiSexpr.Key.Value, out var y))
 						{
 							//a call to 'yield' that returns the yieldinstruction
@@ -262,14 +272,9 @@ public class Interpreter
 		}
 	}
 
-	private IEnumerator<YieldInstruction> CFRoutine(SExpr sexpr, RuntimeBase context, Routine? routineContext = null)
+	private IEnumerator<YieldInstruction> CFRoutine(SExpr sexpr, RuntimeBase context)
 	{
 		var routine = new Routine(sexpr, context);
-		if (routineContext != null)
-		{
-			yield return new YieldForRoutine(routine);
-			Console.WriteLine("i hope this works");
-		}
 		var n = context.Game.RoutineSystem.StartRoutine(routine);
 		while (n != null && n.MoveNext())
 		{

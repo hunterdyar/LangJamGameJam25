@@ -34,12 +34,12 @@
 		(if (eq :sight 1) [ 
 			#if player is in sight and adjacent, attack
 			#if player is in sight and not adjacent, move forwards
-				(print "player...")
-				(print :dp)
 				(if (eq :dp 1) [
+						(print "attack player")
 						(set next "move-attack")
 						(return 1)
 					])
+				(print "go towards player...")
 				(if (eq facing 1) (set next "move-right") (set next "move-left"))
 				(return 1)
 	])
@@ -50,12 +50,12 @@
 }
 
 {dist-to-player-in-front
-	(if (eq :facing 1)
-	(return (sub :x (get-from :player x)))
+	(if (eq :facing -1)
+		(return (sub :x (get-from :player x)))
 	)
 
-	(if (eq :facing -1)
-	(return (sub (get-from :player x) :x))
+	(if (eq :facing 1)
+		(return (sub (get-from :player x) :x))
 	)
 }
 
