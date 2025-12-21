@@ -56,13 +56,14 @@
 	)
 }
 {move-swap
+	(print "in move-swap")
 	(start-routine 
 		(if (eq :taking-turn 1) (print "fuck")
 			(if (gt :facing 0) (set facing -1) (set facing 1))
 		)
 	)
 }
-{move-slash
+{move-attack
 	# coroutine
 	# x+facing
 	# grid get entity at ???

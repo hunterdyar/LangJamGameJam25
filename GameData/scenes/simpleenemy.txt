@@ -10,31 +10,37 @@
 
 {render
 	(if (eq :facing 1)
-		(draw-grid-sprite :g (get x) (get y) evil-stone)
+		(draw-grid-sprite :g (get x) (get y) evil-stone-right)
 		(if (eq :facing -1)
-			(draw-grid-sprite :g (get x) (get y) evil-stone)
+			(draw-grid-sprite :g (get x) (get y) evil-stone-left)
 		)
 	)
 }
 
+{enemy-turn
+	(print "enemy doing move:")
+	(print :next)
+	(invoke :next)
+}
 
 {decide-next
-	(set @dp dist-to-player-in-front)
+	(set @dp (dist-to-player-in-front))
+	(set @sight (player-in-sight))
 
 	#if player is opposite self, turn around
-	(if is-player-in-front [(set next "move-flip") (return 1)])
-	#if player is in sight and adjacent, attack
-	#if player is in sight and not adjacent, move forwards
-	(if is-player-in-sight [
-		(print "player...")
-		(print :dp)
-		(if (eq :dp 1) [
-				(set next "move-attack")
+	(if (eq :sight -1) [(set next "move-swap") (return 1)])
+		#so player must be in front. are they directly in front?
+		(if (eq :sight 1) [ 
+			#if player is in sight and adjacent, attack
+			#if player is in sight and not adjacent, move forwards
+				(print "player...")
+				(print :dp)
+				(if (eq :dp 1) [
+						(set next "move-attack")
+						(return 1)
+					])
+				(if (eq facing 1) (set next "move-right") (set next "move-left"))
 				(return 1)
-			])
-		(if (eq facing 1) (set next "move-right") (set next "move-left"))
-		(return 1)
-
 	])
 
 	(set next "move-none")
@@ -51,7 +57,8 @@
 	(return (sub (get-from :player x) :x))
 	)
 }
-{is-player-in-sight
+
+{player-in-sight
 	(set @px (get-from :player x))
 
 	#facing right
@@ -59,16 +66,18 @@
 		(if (gt :px :x) [
 			(for @k (range (add :x 1) (sub :px 1))
 				#for every space between us, if an entity, return false.
-				(if (has-entity-at :k) (if (eq :px :k) (return true) (return false)))
+				(if (has-entity-at :k) (if (eq :px :k) (return 1) (return 0)))
 			)
-		] (return false))
+		] (return -1))
 	])
  
 	#facing left
 	(if (eq :facing -1)[
 		(if (lt :px :x)[
-			
-		] (return false)
+			(for @k (range (add :px 1) (sub :x 1))
+				(if (has-entity-at :k) (if (eq :px :k) (return 1) (return 0)))
+			)
+		] (return -1)
 		)
 	])
 (for @tx (range ))

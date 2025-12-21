@@ -45,6 +45,13 @@
 }
 
 {on-input-select
+	(print "start turn. Doing player move.")
+	(start-routine [
 	(print (get :card :highlighted-card))
 	(broadcast (get :calls :highlighted-card))
+	(print "player moves. now enemies move.")
+	(broadcast enemy-turn)
+	(print "player moves. broadcasting to decide next.")
+	(broadcast decide-next)
+	])
 }
