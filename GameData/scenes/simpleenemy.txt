@@ -5,6 +5,7 @@
 	(set @y 0)
 	(set @facing 1)
 	(set @g (find-comp-in-parent grid))
+	(set @board (find-type gameplay))
 	(set @player (find-type player))
 }
 
@@ -24,8 +25,8 @@
 }
 
 {decide-next
-	(set @dp (dist-to-player-in-front))
-	(set @sight (player-in-sight))
+	(set @dp (round (dist-to-player-in-front)))
+	(set @sight (round (player-in-sight)))
 
 	#if player is opposite self, turn around
 	(if (eq :sight -1) [(set next "move-swap") (return 1)])
@@ -80,5 +81,13 @@
 		] (return -1)
 		)
 	])
-(for @tx (range ))
+}
+
+{has-entity-at @space
+	(for @entity (children :board)
+		[
+		(if (eq (get-from :entity x) :space) [(return false)])
+		]
+	)
+	(return true)
 }
