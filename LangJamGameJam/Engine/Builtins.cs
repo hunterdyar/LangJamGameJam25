@@ -77,18 +77,27 @@ public static class Builtins
 
 	private static RuntimeObject? Children(RuntimeBase context, RuntimeObject[] args)
 	{
-		if (args[0] is LJRuntimeBaseReference lrb)
+		Scene target;
+		if (args.Length == 0)
 		{
-			LJList list = new LJList();
-			foreach (var child in lrb.Value.Scene.Children)
-			{
-				list.Value.Add(new LJSceneReference(child));
-			}
-
-			return list;
+			target = context.Scene;
+		}else if (args[0] is LJRuntimeBaseReference lrb)
+		{
+			target = lrb.Value.Scene;
+		}
+		else
+		{
+			throw new Exception("can't get children, is not scene or component.");
+		}
+		
+		LJList list = new LJList();
+		foreach (var child in target.Children)
+		{
+			list.Value.Add(new LJSceneReference(child));
 		}
 
-		throw new Exception("can't get children, is not scene or component.");
+		return list;
+
 	}
 
 

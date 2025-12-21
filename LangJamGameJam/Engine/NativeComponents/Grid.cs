@@ -54,6 +54,8 @@ public class Grid : NativeComponent
 	{
 		switch (id)
 		{
+			case "has-scene-at":
+				throw new NotImplementedException("has scene at goes here...");
 			case "get-scene-at":
 				throw new NotImplementedException("get scene at goes here....");
 				break;

@@ -1,9 +1,11 @@
-(components moves)
+(components moves movepreview)
 {on-spawn
+	(set @next "none")
 	(set @x 0)
 	(set @y 0)
 	(set @facing 1)
 	(set @g (find-comp-in-parent grid))
+	(set @player (find-type player))
 }
 
 {render
@@ -13,4 +15,61 @@
 			(draw-grid-sprite :g (get x) (get y) evil-stone)
 		)
 	)
+}
+
+
+{decide-next
+	(set @dp dist-to-player-in-front)
+
+	#if player is opposite self, turn around
+	(if is-player-in-front [(set next "move-flip") (return 1)])
+	#if player is in sight and adjacent, attack
+	#if player is in sight and not adjacent, move forwards
+	(if is-player-in-sight [
+		(print "player...")
+		(print :dp)
+		(if (eq :dp 1) [
+				(set next "move-attack")
+				(return 1)
+			])
+		(if (eq facing 1) (set next "move-right") (set next "move-left"))
+		(return 1)
+
+	])
+
+	(set next "move-none")
+	(return 0)
+	#do nothing
+}
+
+{dist-to-player-in-front
+	(if (eq :facing 1)
+	(return (sub :x (get-from :player x)))
+	)
+
+	(if (eq :facing -1)
+	(return (sub (get-from :player x) :x))
+	)
+}
+{is-player-in-sight
+	(set @px (get-from :player x))
+
+	#facing right
+	(if (eq :facing 1)[
+		(if (gt :px :x) [
+			(for @k (range (add :x 1) (sub :px 1))
+				#for every space between us, if an entity, return false.
+				(if (has-entity-at :k) (if (eq :px :k) (return true) (return false)))
+			)
+		] (return false))
+	])
+ 
+	#facing left
+	(if (eq :facing -1)[
+		(if (lt :px :x)[
+			
+		] (return false)
+		)
+	])
+(for @tx (range ))
 }

@@ -13,7 +13,7 @@ public class Tokenizer
 	public string GetPrettyPos(int position)
 	{
 		string err = "";
-		int line = 0;
+		int line = 1;
 		int col = 0;
 		for (int i = 0; i < position; i++)
 		{
@@ -82,39 +82,39 @@ public class Tokenizer
 		{
 			case '~':
 				pos++;
-				token = new Token(TokenType.Bool, c);
+				token = new Token(TokenType.Bool, pos, c);
 				return true;
 			case '|':
 				pos++;
-				token = new Token(TokenType.Numeric, c);
+				token = new Token(TokenType.Numeric, pos, c);
 				return true;
 			case '!':
 				pos++;
-				token = new Token(TokenType.Point,c);
+				token = new Token(TokenType.Point,pos, c);
 				return true;
 			case '[':
 				pos++;
-				token = new Token(TokenType.OpenGroup, c);
+				token = new Token(TokenType.OpenGroup, pos, c);
 				return true;
 			case ']':
 				pos++;
-				token = new Token(TokenType.CloseGroup,c);
+				token = new Token(TokenType.CloseGroup,pos, c);
 				return true;
 			case '(':
 				pos++;
-				token = new Token(TokenType.OpenParen, c);
+				token = new Token(TokenType.OpenParen, pos, c);
 				return true;
 			case ')':
 				pos++;
-				token = new Token(TokenType.CloseParen, c);
+				token = new Token(TokenType.CloseParen, pos, c);
 				return true;
 			case '{':
 				pos++;
-				token = new Token(TokenType.OpenDeclare, c);
+				token = new Token(TokenType.OpenDeclare, pos, c);
 				return true;
 			case '}':
 				pos++;
-				token = new Token(TokenType.CloseDeclare, c);
+				token = new Token(TokenType.CloseDeclare, pos, c);
 				return true;
 			case '@':
 				pos++;

@@ -19,3 +19,14 @@
 	)
 }
 
+{has-entity-at @space
+
+(for @entity (children)
+		[
+		(if (eq (get-from :entity x) :space) [(return true)])
+		]
+	)
+	(return false)
+	
+
+}

@@ -5,12 +5,14 @@ namespace LangJam.Loader.Parser;
 public class Parser
 {
 	public List<AST.Expr> RootExpressions = new List<AST.Expr>();
+	private Tokenizer _tokenizer;
 	private Queue<Token> _tokens;
 	private string _context;
 	public void Parse(string contextName, string source)
 	{
 		_context = contextName;
 		var t = new Tokenizer();
+		_tokenizer = t;
 		var tokens = t.Tokenize(contextName, source); 
 		_tokens = new Queue<Token>(tokens);
 
@@ -61,7 +63,7 @@ public class Parser
 				throw new Exception($"Unexpected end of file in {_context}.");
 		}
 
-		throw new Exception($"Unexpected token {top} in {_context}");
+		throw new Exception($"Unexpected token {top} in {_context} at {_tokenizer.GetPrettyPos(top.Position)}");
 	}
 
 	private Expr ParseBool()

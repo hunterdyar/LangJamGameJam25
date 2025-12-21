@@ -8,8 +8,11 @@
 	(set-in grid cols 3)
 	(set-in grid h-align center)
 	(set-in grid v-align middle)
+	(set @p (find-type player))
 	(set @card-h (list "move-left-h" "move-swap-h" "move-right-h"))
 	(set @card (list "move-left" "move-swap" "move-right"))
+	(set @calls (list "p-move-left" "p-move-swap" "p-move-right"))
+
 	(set @highlighted-card 1)
 }
 
@@ -42,5 +45,6 @@
 }
 
 {on-input-select
-	(broadcast (get :card :highlighted-card))
+	(print (get :card :highlighted-card))
+	(broadcast (get :calls :highlighted-card))
 }
